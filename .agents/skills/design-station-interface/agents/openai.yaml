@@ -1,0 +1,4 @@
+interface:
+  display_name: "Station Interface Design"
+  short_description: "Design light, futuristic station interfaces"
+  default_prompt: "Use $design-station-interface to design or review this Station Zhasyl-1 interface."

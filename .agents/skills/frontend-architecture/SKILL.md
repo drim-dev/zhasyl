@@ -5,7 +5,9 @@ description: Use when working on the Next.js frontend — pages, layouts, React 
 
 # Frontend Architecture (Next.js)
 
-The frontend is Next.js (App Router) with TypeScript in strict mode. All UI MUST follow `frontend/DESIGN_SYSTEM.md`.
+The frontend is Next.js (App Router) with TypeScript in strict mode. Before UI work, use
+`../design-station-interface/SKILL.md` and follow
+`../../../docs/designs/interface-design-system.md`.
 
 ## When to Use This Skill
 
@@ -28,9 +30,11 @@ Use when adding or changing anything in `frontend/`:
 - **`components/ui/`**: base/primitive components (Button, Input, Card, …).
 - **`components/`**: feature-specific and shared components. Co-locate related components in feature folders when appropriate.
 
-**ALL components MUST adhere to `frontend/DESIGN_SYSTEM.md`:** stone palette for light mode, gray for dark backgrounds/borders, universal focus ring on all interactive elements, defined button sizes (`md`/`lg`), typography with explicit line-heights, consistent spacing/shadows/radius. Never deviate without explicit approval.
-
-Focus ring pattern: `focus:outline-none focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-600 focus:ring-offset-2 dark:focus:ring-offset-gray-950`
+**All components must follow the Station interface design direction.** Consume semantic design
+tokens rather than copying raw colours into feature components. Keep focus visible on every
+interactive element, use explicit line heights, and preserve the light, calm, near-future visual
+character. Do not introduce dark neon cockpit styling, a generic school dashboard, or a separate
+component aesthetic.
 
 **Form controls MUST be associated with a label.** Every `<input>`/`<select>`/`<textarea>` needs a `<label htmlFor={id}>` with a matching `id` (or wrap the control in its `<label>`, or set `aria-label`). A bare sibling `<label>` is NOT associated — it breaks screen readers AND accessible-name queries (`getByLabel`, `getByRole('textbox', { name })`) in tests. Accessibility and testability are the same requirement here — write the identifier every time.
 
@@ -109,7 +113,9 @@ When you do create BFF routes: mirror backend endpoint structure; handle auth, r
 5. Pass data from Server Component to Client Components via props.
 6. Client Components use Server Actions for mutations.
 7. Create shared types in `types/` if needed.
-8. Follow `frontend/DESIGN_SYSTEM.md` for ALL UI.
+8. Follow the Station interface design direction for all UI.
+9. Verify keyboard focus, responsive states, save/error feedback, reduced motion, and long
+   Russian and Kazakh text.
 
 ## TypeScript Guidelines
 

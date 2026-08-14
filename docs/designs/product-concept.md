@@ -34,7 +34,7 @@ discovering a medicine with one click, or replacing real laboratory validation.
 The station represents Kazakhstan's inclusive civic identity rather than one ethnicity. Its
 recurring fictional crew should naturally include Kazakh, Russian, Ukrainian, Chechen, Korean,
 German, Uighur, and other names found in Kazakhstan. Places, biographies, memories, and examples
-may connect the crew to Pavlodar, Almaty, Astana, Karaganda, Kostanay, Shymkent, Semey, Aktau, and
+may connect the crew to Pavlodar, Almaty, Astana, Karaganda, Kostanay, Shymkent, Atyrau, Aktau, and
 other regions.
 
 This should be expressed through credible characters and everyday detail, not a checklist of
@@ -52,24 +52,24 @@ The product deliberately avoids unnecessary school terminology.
 
 | Conventional term | Station term | Meaning |
 | --- | --- | --- |
-| Subject area | Laboratory | A broad field that can contain many independent paths |
-| Course | Mission | A substantial path with a story, competencies, and final product |
+| Course or subject area | Laboratory | An independently chosen field and ordered curriculum |
+| Applied project or module | Mission | A substantial station problem with a story, competencies, and final product |
 | Lesson | Station assignment | One focused learning session within a mission |
 | Notebook | Scientific journal | Predictions, code, evidence, output, and reflection |
 | Homework | Station assignment | Work that may be continued with a parent outside a session |
 | Test | System check | A deterministic check of an observable result |
-| Course progress | Mission readiness | The learner's progress inside one mission |
+| Project progress | Mission readiness | The learner's progress inside one mission |
 
 The hierarchy is:
 
 ```text
 Station Zhasyl-1
 └── Laboratory
-    ├── Mission
+    ├── Mission 1
     │   ├── Station assignment
     │   ├── Station assignment
     │   └── System check
-    └── Mission
+    └── Mission 2 (after Mission 1)
 ```
 
 ## Product languages
@@ -90,9 +90,10 @@ age-appropriate voice.
 
 ## Choice and progress
 
-A learner may participate in several laboratories and missions at the same time. Progress is
-independent per learner and per mission. Completing one mission must never require completing an
-unrelated laboratory.
+A learner may participate in several laboratories at the same time. Laboratories are mutually
+independent, but their core missions are ordered: later missions build on confirmed scientific
+and programming knowledge from earlier missions in the same laboratory. No mission may require
+completion of an unrelated laboratory.
 
 The product must not expose a global station-completion percentage. Such a number becomes
 meaningless when multiple children repeat a mission or new missions are added. Instead it may
@@ -104,11 +105,13 @@ show:
 - narrative consequences unlocked for that learner.
 
 Station-wide story facts are authored canon, not a counter advanced collectively by all users.
-Each learner experiences the story at their own pace.
+Each learner experiences the story at their own pace. New required missions are normally appended
+to a laboratory sequence; inserting content must not revoke access or readiness already earned by
+existing learners.
 
 ## Initial laboratories
 
-The first planned paths serve two different learners and remain fully independent:
+The first planned laboratories serve two different learners and remain fully independent:
 
 - a bioinformatics laboratory whose initial mission is BioScout, aimed first at a nine-year-old
   who already understands conditions, loops, lists, and dictionaries;
@@ -131,6 +134,9 @@ designed from observed needs rather than hidden behind an unused class abstracti
 ## Product principles
 
 - Lead with a meaningful station problem, then introduce the required theory and syntax.
+- Keep each mission as one substantial applied problem; introduce concepts through its station
+  assignments rather than splitting the problem into syntax-sized missions.
+- Provide one canonical path and progressive hints instead of authored difficulty modes.
 - Make the learner's code change what happens in the story.
 - Preserve freedom to choose laboratories without completion pressure.
 - Treat mistakes as evidence and part of investigation.
@@ -144,3 +150,7 @@ designed from observed needs rather than hidden behind an unused class abstracti
 
 - [Platform architecture](platform-architecture.md)
 - [Learning workspaces and AI agent](learning-workspaces-and-ai-agent.md)
+- [Initial laboratory mission map](../../content/ru/world/laboratory-mission-map.md)
+- [Station interface design direction](interface-design-system.md)
+- [MVP scope](mvp-scope.md)
+- [First vertical slice plan](../plans/first-vertical-slice.md)

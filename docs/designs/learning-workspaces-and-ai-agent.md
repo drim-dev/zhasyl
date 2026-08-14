@@ -11,6 +11,74 @@ The AI capability is a bounded learning agent, not a generic chat assistant and 
 coding agent. Its objective is a working artifact that the learner understands and can recreate
 in a related situation.
 
+The MVP is intentionally complete without this agent. The agent is a later enhancement over
+stable learning, workspace, and evidence capabilities; it must not become a prerequisite for
+opening content, writing code, receiving authored help, running checks, saving progress, or
+finishing a mission.
+
+## Single authored path in the MVP
+
+Every practical assignment has one stable identity, one canonical authored path, and one set of
+completion criteria. The MVP does not publish separate guided, starter, or open versions.
+
+A mission remains a substantial applied station problem. Its ordered station assignments
+introduce the required scientific and programming knowledge in small steps while preserving one
+continuous narrative and final artifact. Core missions are ordered within a laboratory because
+later missions build on confirmed competencies and verified artifacts from earlier missions.
+Laboratories remain independent and may be pursued in parallel.
+
+Mission metadata declares required, introduced, practised, and optional advanced competencies.
+The content owns progressive hints, core and optional theory, transfer questions, system checks,
+and completion criteria. A small recovery example may help a learner return to the same path, and
+an optional investigation may follow the core result; neither creates a separate difficulty mode.
+
+The MVP can therefore teach a complete mission when no model is configured. A future agent may
+explain the current step or choose the next progressive hint, but it must not reorder the
+curriculum, invent alternate paths, or become the authority for mission progression.
+
+## Agent-ready seams
+
+The MVP exposes ordinary application capabilities that a future agent can use through narrow tool
+adapters:
+
+- resolve versioned mission and assignment context;
+- list and read an explicitly scoped workspace resource;
+- read the latest run output or traceback;
+- run a deterministic system check and receive structured result codes;
+- retrieve an authored hint by stable identifier and level;
+- read confirmed competency evidence;
+- record a provisional observation without promoting it to confirmed evidence;
+- request adult help;
+- build a factual adult summary.
+
+The browser UI and future tools call the same authorized use cases. The tool layer is added with
+the first agent slice; the MVP does not contain empty agent interfaces, provider SDKs, prompt
+tables, conversation tables, or a generic tool framework.
+
+The learning workbench reserves a support surface beside the editor. In the MVP it presents
+authored theory, hints, checks, and reflection prompts. A future mentor panel can use the same
+context and layout without replacing the editor or changing workspace persistence. Do not ship an
+empty chat placeholder.
+
+Workspace disclosure is resource-scoped from the beginning. A learner action can identify the
+current file, selected notebook cell, latest error, or check result. The future agent receives
+only those authorized resources rather than a whole workspace or device.
+
+### Activity and evidence
+
+Persist facts that are already valuable without AI:
+
+- assignment session started and completed;
+- authored hint requested and its level;
+- workspace version saved;
+- program run and structured check result;
+- learner reflection submitted;
+- competency evidence confirmed by deterministic or rubric-based checks.
+
+Records use stable identifiers and explicit actor or source values. `agent` can be added as a new
+actor later without changing the meaning or ownership of core entities. Agent observations remain
+provisional until combined with deterministic results, explanation evidence, or a transfer task.
+
 ## Workspace model
 
 Use `Workspace` as the durable product concept rather than making `Notebook` the root entity. A
@@ -112,6 +180,10 @@ The initial tool set is narrow and mostly read-only:
 The agent cannot access arbitrary local files, execute a shell, install packages, use unrestricted
 network access, modify source files, publish work, or communicate with other people. Suggested
 changes may be displayed as a small example or diff, but the learner applies them.
+
+These tools are adapters over the application capabilities described above. Adding them must not
+change content formats, workspace storage, deterministic check contracts, competency identities,
+or mission completion rules.
 
 ## Pedagogical loop
 
@@ -217,11 +289,25 @@ not grant the station access to the rest of the computer.
 
 ## Initial validation slice
 
-Validate this design with one BioScout assignment and one materials-laboratory assignment. Each
-slice should include authored theory, a browser workspace, persistence, a deterministic check, a
-tool-aware agent, an explanation checkpoint, and an adult summary. Compare a lean tool-aware
+First validate the agent-free MVP with one BioScout assignment and one materials-laboratory
+assignment. Each slice includes the canonical authored path, progressive hints, a browser
+workspace, persistence, structured deterministic checks, an explanation checkpoint, activity
+evidence, and
+an adult summary.
+
+The first later agent slice reuses one of those completed assignments unchanged. It adds tool
+adapters, conversation persistence, safety controls, and a mentor panel. Compare a lean tool-aware
 prompt with the older scripted style using learning outcomes and cost rather than subjective chat
 quality.
+
+Agent readiness is accepted only when:
+
+- the complete mission remains usable with the agent disabled;
+- agent tools wrap existing authorized application use cases;
+- adding the agent requires no rewrite of mission content, workspace persistence, system checks,
+  progress, competency identifiers, or localization;
+- existing activity records provide enough context for a useful first agent session;
+- agent observations cannot bypass deterministic completion and evidence rules.
 
 ## Related designs
 

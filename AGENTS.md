@@ -10,13 +10,20 @@ or fictional universe above it.
 
 The learning hierarchy is:
 
-- laboratories are broad subject areas;
-- missions are substantial learning paths with a story and final product;
-- station assignments are individual learning sessions;
+- laboratories are broad subject areas and ordered curricula;
+- missions are substantial applied projects with a story, final product, and a defined position
+  inside one laboratory;
+- station assignments are individual learning sessions and incremental steps inside a mission;
 - scientific journals are executable notebooks and reflections;
 - system checks verify observable outcomes.
 
-BioScout is an initial mission in the bioinformatics laboratory. MatterLab is a working name for
+Laboratories are independent, and a learner may work in several at once. Core missions inside one
+laboratory are sequential because later missions build on confirmed scientific and programming
+knowledge. A mission remains one substantial station problem; do not split it into separate
+missions merely to introduce a file format, syntax feature, algorithm, or scientific concept.
+
+BioScout is the first mission in the bioinformatics laboratory. Its plant-disease investigation
+remains one complete mission. MatterLab is a working name for
 an initial mission in the materials laboratory, not a separate product.
 
 This is a single monorepo. Do not introduce cross-repository dependencies or assume that a
@@ -131,21 +138,32 @@ Also read `.agents/skills/database-ef-core/SKILL.md` for data-layer work.
   limited choices, and immediate feedback.
 - Support phone, tablet, and desktop layouts.
 
-Read `.agents/skills/frontend-architecture/SKILL.md` before changing `frontend/`. Also read the
-validation and error-handling skills for forms and request flows.
+Before changing `frontend/`, read both:
+
+1. `.agents/skills/frontend-architecture/SKILL.md`
+2. `.agents/skills/design-station-interface/SKILL.md`
+
+Follow `docs/designs/interface-design-system.md` for visual and interaction decisions. Also read
+the validation and error-handling skills for forms and request flows.
 
 ## Learning content
 
 - Every mission has a continuous story, a concrete final product, and observable progress after
   each station assignment.
+- Author one canonical assignment path and one set of completion criteria. Use progressive hints
+  and optional post-completion investigations instead of authored difficulty modes.
+- Introduce scientific and programming knowledge incrementally through station assignments while
+  preserving the mission as one substantial applied problem.
+- Keep laboratories mutually independent. Order core missions within a laboratory, and do not
+  create prerequisites across laboratories.
 - Each station assignment explains what the learner is trying to achieve and why the idea matters
   before introducing syntax.
 - Keep mandatory theory discussable in 10–15 minutes. Put deeper explanations in an optional
   researcher note.
 - Ask the learner to predict an outcome before running code.
 - Separate fictional data, simplified models, hypotheses, computed results, and scientific facts.
-- Adult guidance must include expected results, common errors, progressive hints, an easier path,
-  and an extension path.
+- Adult guidance must include expected results, common errors, progressive hints, a small
+  recovery example within the same path, and an optional post-completion investigation.
 - Never publish real personal, medical, or genomic data from children.
 - Do not provide child-directed instructions for hazardous household chemistry. Any physical
   experiment requires adult supervision, child-appropriate materials, explicit safety guidance,
@@ -163,6 +181,35 @@ Do not add decorative diagrams that do not teach a relationship or process.
 - Do not place credentials or private service endpoints in browser notebooks.
 - Synchronize learner work to durable application storage and provide an explicit download/export
   path; browser storage alone is not a durable backup.
+
+## Agent-ready MVP
+
+The MVP must be complete and usable without an LLM or learning agent. Preserve an agent-ready
+architecture through ordinary product boundaries rather than speculative AI abstractions:
+
+- Author mission theory, the canonical assignment sequence, progressive hints, checks, and
+  completion criteria in versioned content. An agent may retrieve or explain authored material
+  later, but does not own the curriculum.
+- Keep mission progression deterministic. The backend opens the next core mission from confirmed
+  completion of the preceding mission in that laboratory; an agent must not reorder the
+  curriculum or invent alternate difficulty paths.
+- Implement mission context, workspace snapshots, system checks, authored hints, reflections,
+  competency evidence, and activity history as cohesive application use cases. Future agent tools
+  adapt to those use cases; they never query the database or blob storage directly.
+- Return structured result and evidence codes from checks. Localized learner messages are a
+  presentation concern and must not be the only machine-readable result.
+- Record which actor produced a material action or observation (`learner`, `adult`, `system`, and
+  later `agent`) without adding agent-specific ownership to core learning entities.
+- Require explicit resource scope when workspace content is read. Design snapshots so a future
+  agent can receive one selected file, notebook cell, error, or check result without receiving an
+  entire account or device.
+- Keep model providers, prompts, conversations, streaming, and token accounting outside the MVP.
+  Add them only with the first agent-backed vertical slice.
+- Keep the deterministic experience available when the agent feature is disabled or unavailable.
+
+Do not add empty `IAgentService` interfaces, placeholder chat tables, provider SDKs, generic event
+buses, or an MCP/tool framework merely to prepare for the future. The reusable seam is the tested
+application behavior, not a speculative infrastructure layer.
 
 ## Code quality
 

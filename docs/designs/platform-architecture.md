@@ -38,7 +38,7 @@ Browser
       -> private ASP.NET Core API
           -> PostgreSQL
           -> Azure Blob Storage
-          -> model provider APIs
+          -> model provider APIs (after the MVP)
 ```
 
 The browser does not call the private backend API or model providers directly. The BFF owns the
@@ -58,8 +58,13 @@ Teacher accounts, classes, invitations, and school administration are outside th
 The domain hierarchy is:
 
 ```text
-Laboratory -> Mission -> StationAssignment
+Laboratory -> ordered Mission -> ordered StationAssignment
 ```
+
+Laboratories are independently chosen and may be active in parallel. Core missions inside one
+laboratory are sequential. Each mission is one substantial applied problem, and its station
+assignments introduce scientific and programming knowledge incrementally. The content model has
+no authored difficulty-mode dimension.
 
 Authored content has stable English machine identifiers and localized display text. The seeding
 process must be idempotent, preserve learner state, and create a new authored-content version when
@@ -107,15 +112,52 @@ stored through a protected process. UI authorization must not be presented as so
 
 The backend saves:
 
-- enrollment in independently chosen missions;
+- participation in independently chosen laboratories and the current unlocked mission in each;
 - assignment status and deterministic check results;
 - competency evidence and learner reflections;
 - workspace metadata and durable versions;
-- concise AI-session summaries and safety records;
+- authored hints used and structured activity history;
 - parent-visible progress summaries.
 
 There is no global station completion value. New content must not reduce a learner's previously
-earned readiness.
+earned readiness. New required missions are normally appended; inserting a mission must not
+retroactively block learners who already passed that point in a laboratory sequence.
+
+### Agent-ready application boundary
+
+The MVP does not call a model provider. It prepares for the future learning agent by making the
+operations already required by the deterministic product reusable and independently authorized:
+
+```text
+Mission UI / future learning agent
+          |
+          v
+Application use cases
+  - resolve assignment context
+  - read a scoped workspace snapshot
+  - run a deterministic system check
+  - retrieve an authored hint
+  - record a reflection or evidence item
+  - build a factual adult summary
+          |
+          v
+PostgreSQL / Blob Storage / content versions
+```
+
+HTTP endpoints and future agent tools are adapters over the same use cases. Neither the BFF nor a
+model owns learning rules. A future agent has no direct database, blob-storage, or unrestricted
+workspace access.
+
+System-check output is structured. It includes stable check and failure codes, status, relevant
+resource locations, safe observed values, and evidence candidates. Localized explanations are
+rendered separately. This supports Russian and Kazakh UI, deterministic progress, and later agent
+reasoning without parsing prose.
+
+The product records learning activity needed by the MVP itself. Conceptual records include an
+assignment session, workspace version, check run, authored hint use, learner reflection, and
+competency evidence. Each record carries stable content identifiers and versions, locale where
+relevant, mission-sequence position, timestamp, and actor or source. These are learning
+records, not an AI chat schema.
 
 ## Deployment
 
@@ -137,8 +179,9 @@ The first useful slice should prove the complete path rather than scaffold every
 4. The child edits and runs a browser workspace.
 5. Work is saved and restored from another session.
 6. A deterministic system check records evidence.
-7. The learning agent gives bounded help using the actual workspace context.
-8. The parent receives a concise session summary.
+7. The child uses progressive authored hints within the canonical assignment path.
+8. Deterministic completion evidence contributes to unlocking the next mission in that laboratory.
+9. The parent receives a concise factual session summary.
 
 The slice uses Russian content, but its identifiers, routes, persistence, and message catalogs
 must pass a localization review showing that a Kazakh version can be added without a schema or
@@ -148,6 +191,7 @@ workspace migration.
 
 - classes and school administration;
 - a general teacher workflow;
+- model-provider integration and the learning agent;
 - arbitrary server-side code execution;
 - local desktop agents and CLI integration;
 - automatic GitHub publication by children;
