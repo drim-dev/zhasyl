@@ -1,16 +1,16 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentValidation.TestHelper;
-using Microsoft.AspNetCore.Mvc.Testing;
+using Zhasyl.Api.Tests.Infrastructure;
 using Zhasyl.Api.Features.Station;
 
 namespace Zhasyl.Api.Tests.Features.Station;
 
-public sealed class GetStationOverviewTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class GetStationOverviewTests : IClassFixture<ZhasylApplicationFactory>
 {
     private readonly HttpClient client;
 
-    public GetStationOverviewTests(WebApplicationFactory<Program> factory)
+    public GetStationOverviewTests(ZhasylApplicationFactory factory)
     {
         client = factory.CreateClient();
     }
@@ -31,6 +31,14 @@ public sealed class GetStationOverviewTests : IClassFixture<WebApplicationFactor
             laboratory => Assert.Equal("materials", laboratory.Id));
     }
 
+    [Fact]
+    public async Task Should_return_not_found_until_a_locale_is_published()
+    {
+        var response = await client.GetAsync("/api/station/overview?locale=kk");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     public sealed class ValidatorTests
     {
         private readonly GetStationOverview.RequestValidator validator = new();
@@ -44,12 +52,20 @@ public sealed class GetStationOverviewTests : IClassFixture<WebApplicationFactor
         }
 
         [Fact]
-        public void Should_reject_unpublished_locale()
+        public void Should_accept_a_future_locale_without_a_code_change()
         {
             var result = validator.TestValidate(new GetStationOverview.Request("kk"));
 
+            result.ShouldNotHaveAnyValidationErrors();
+        }
+
+        [Fact]
+        public void Should_reject_an_invalid_locale()
+        {
+            var result = validator.TestValidate(new GetStationOverview.Request("not-a-locale"));
+
             result.ShouldHaveValidationErrorFor(request => request.Locale)
-                .WithErrorCode("content:locale:read:not_published");
+                .WithErrorCode("content:locale:read:invalid");
         }
     }
 }

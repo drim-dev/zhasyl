@@ -1,6 +1,8 @@
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Zhasyl.Api.Common.Http;
+using Zhasyl.Api.Database;
 
 namespace Zhasyl.Api.Features.Station;
 
@@ -15,13 +17,24 @@ public static class GetStationOverview
                 ISender sender,
                 CancellationToken cancellationToken) =>
             {
-                var response = await sender.Send(new Request(locale ?? "ru"), cancellationToken);
-                return Results.Ok(response);
+                var normalizedLocale = (locale ?? "ru").Trim().ToLowerInvariant();
+                var response = await sender.Send(new Request(normalizedLocale), cancellationToken);
+
+                return response is null
+                    ? Results.Problem(
+                        statusCode: StatusCodes.Status404NotFound,
+                        title: "Content not found",
+                        detail: "The requested station content is not published in this locale.",
+                        extensions: new Dictionary<string, object?>
+                        {
+                            ["code"] = "content:locale:read:not_published"
+                        })
+                    : Results.Ok(response);
             });
         }
     }
 
-    public sealed record Request(string Locale) : IRequest<Response>;
+    public sealed record Request(string Locale) : IRequest<Response?>;
 
     public sealed record Response(
         string StationId,
@@ -49,46 +62,95 @@ public static class GetStationOverview
         public RequestValidator()
         {
             RuleFor(request => request.Locale)
-                .Equal("ru")
-                .WithMessage("The requested locale is not published.")
-                .WithErrorCode("content:locale:read:not_published");
+                .Matches("^[a-z]{2}(?:-[a-z]{2})?$")
+                .WithMessage("The locale must be a supported language tag.")
+                .WithErrorCode("content:locale:read:invalid");
         }
     }
 
-    public sealed class RequestHandler : IRequestHandler<Request, Response>
+    public sealed class RequestHandler(AppDbContext db) : IRequestHandler<Request, Response?>
     {
-        public Task<Response> Handle(Request request, CancellationToken cancellationToken)
+        public async Task<Response?> Handle(Request request, CancellationToken cancellationToken)
         {
-            var response = new Response(
-                "zhasyl-1",
-                "Станция «Жасыл-1»",
-                request.Locale,
-                "Равнина Аркадия · Марс · 2035 год",
-                "Станция готовит инфраструктуру к прибытию большой группы поселенцев. Каждая лаборатория решает реальные задачи будущего поселения.",
-                [
-                    new LaboratorySummary(
-                        "bioinformatics",
-                        "Лаборатория биоинформатики",
-                        "Исследует живые системы станции с помощью данных и программирования.",
-                        "Лариса Ким",
-                        new MissionSummary(
-                            "bioscout",
-                            "BioScout: код Красной планеты",
-                            "В агрокомплексе обнаружены признаки неизвестной болезни растений.",
-                            "Подготовка первого задания")),
-                    new LaboratorySummary(
-                        "materials",
-                        "Лаборатория материалов",
-                        "Проектирует безопасные материалы для ремонта и расширения станции.",
-                        "Зарема Дадаева",
-                        new MissionSummary(
-                            "sealant-17",
-                            "Герметик № 17",
-                            "Нужно подобрать модель состава для герметизации жилого модуля.",
-                            "Подготовка первого задания"))
-                ]);
+            var station = await db.StationTranslations
+                .AsNoTracking()
+                .Where(translation =>
+                    translation.Station.Slug == "zhasyl-1" &&
+                    translation.Locale == request.Locale)
+                .Select(translation => new
+                {
+                    translation.StationId,
+                    translation.Station.Slug,
+                    translation.Name,
+                    translation.Location,
+                    translation.Briefing,
+                })
+                .SingleOrDefaultAsync(cancellationToken);
 
-            return Task.FromResult(response);
+            if (station is null)
+            {
+                return null;
+            }
+
+            var laboratoryRows = await db.LaboratoryTranslations
+                .AsNoTracking()
+                .Where(translation =>
+                    translation.Laboratory.StationId == station.StationId &&
+                    translation.Laboratory.IsPublished &&
+                    translation.Locale == request.Locale)
+                .OrderBy(translation => translation.Laboratory.Order)
+                .Select(translation => new
+                {
+                    translation.LaboratoryId,
+                    translation.Laboratory.Slug,
+                    translation.Name,
+                    translation.Purpose,
+                    translation.Specialist,
+                })
+                .ToListAsync(cancellationToken);
+
+            var missionRows = await db.MissionRevisions
+                .AsNoTracking()
+                .Where(revision =>
+                    revision.Mission.Laboratory.StationId == station.StationId &&
+                    revision.Mission.Laboratory.IsPublished &&
+                    revision.Mission.IsPublished &&
+                    revision.Locale == request.Locale &&
+                    revision.IsCurrent &&
+                    revision.PublishedAt != null)
+                .OrderBy(revision => revision.Mission.Laboratory.Order)
+                .ThenBy(revision => revision.Mission.Order)
+                .Select(revision => new
+                {
+                    revision.Mission.LaboratoryId,
+                    Summary = new MissionSummary(
+                        revision.Mission.Slug,
+                        revision.Name,
+                        revision.Problem,
+                        revision.Status),
+                })
+                .ToListAsync(cancellationToken);
+
+            var firstMissionByLaboratory = missionRows
+                .GroupBy(row => row.LaboratoryId)
+                .ToDictionary(group => group.Key, group => group.First().Summary);
+            var laboratories = laboratoryRows
+                .Where(row => firstMissionByLaboratory.ContainsKey(row.LaboratoryId))
+                .Select(row => new LaboratorySummary(
+                    row.Slug,
+                    row.Name,
+                    row.Purpose,
+                    row.Specialist,
+                    firstMissionByLaboratory[row.LaboratoryId]))
+                .ToList();
+
+            return new Response(
+                station.Slug,
+                station.Name,
+                request.Locale,
+                station.Location,
+                station.Briefing,
+                laboratories);
         }
     }
 }

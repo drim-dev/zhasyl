@@ -1,6 +1,19 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var api = builder.AddProject<Projects.Zhasyl_Api>("api");
+var postgres = builder.AddPostgres("postgres")
+    .WithImageTag("17")
+    .WithDataVolume("zhasyl-postgres-data")
+    .AddDatabase("zhasyl");
+
+var storage = builder.AddAzureStorage("storage")
+    .RunAsEmulator(emulator => emulator.WithDataVolume("zhasyl-azurite-data"));
+var blobs = storage.AddBlobs("blobs");
+
+var api = builder.AddProject<Projects.Zhasyl_Api>("api")
+    .WithReference(postgres)
+    .WaitFor(postgres)
+    .WithReference(blobs)
+    .WaitFor(blobs);
 
 builder.AddJavaScriptApp("frontend", "../frontend", "dev")
     .WithReference(api)

@@ -12,6 +12,7 @@ through .NET Aspire.
 - .NET SDK 10.0.300
 - Node.js 24.9.0
 - npm 11.6.0
+- Docker Desktop or another Docker-compatible runtime
 - an HTTPS development certificate is recommended for the Aspire dashboard
 
 The exact .NET and Node versions are declared in global.json and .nvmrc.
@@ -28,9 +29,10 @@ make restore
 make dev
 ~~~
 
-Aspire starts the API and frontend, injects the private API address into the Next.js server, and
-exposes the browser application at http://localhost:3000. The dashboard URL and login token are
-printed to the terminal.
+Aspire starts PostgreSQL 17, Azurite, the API, and the frontend. It injects private service and
+storage addresses, applies EF Core migrations, seeds MDX content, and exposes the browser
+application at http://localhost:3000. The dashboard URL and login token are printed to the
+terminal. PostgreSQL and Azurite use named development volumes so their state survives restarts.
 
 The browser does not call the ASP.NET Core API directly. The station overview is rendered on the
 Next.js server from the private API response. The interface follows the operating-system colour
@@ -55,7 +57,7 @@ Zhasyl.ServiceDefaults/  Health, resilience, telemetry, and service discovery de
 backend/src/Zhasyl.Api/  Private ASP.NET Core API
 backend/tests/           Backend component and validator tests
 frontend/                Next.js frontend and BFF
-content/ru/              Russian learner-facing source content
+content/                 Localized station, laboratory, and mission MDX source
 docs/designs/            Planned product and architecture decisions
 docs/specs/              Current implemented behavior
 docs/plans/              Implementation and validation plans
@@ -63,3 +65,6 @@ docs/plans/              Implementation and validation plans
 
 Code and technical documentation are written in English. Learner-facing materials are authored
 in their publication locale, beginning with Russian.
+
+See [Content authoring](docs/guides/content-authoring.md) for the frontmatter contract and revision
+behavior.
