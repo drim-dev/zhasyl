@@ -5,7 +5,7 @@ description: Design and review Station Zhasyl-1 user interfaces. Use for UX flow
 
 # Design Station Interface
 
-Create a light, calm, near-future station interface that helps a child read, investigate, and
+Create a calm, visually lightweight, near-future station interface in light and dark themes that helps a child read, investigate, and
 write code without decorative science-fiction noise.
 
 ## Required reference
@@ -24,7 +24,7 @@ Preserve compatibility where necessary and report the inconsistency.
 2. State the screen's single primary action and the evidence of success.
 3. Separate narrative, scientific facts, learner work, and system output.
 4. Reuse existing primitives and semantic tokens before adding a variant or dependency.
-5. Design default, loading, empty, error, disabled, focus, save/offline, and narrow-screen states.
+5. Design light, dark, loading, empty, error, disabled, focus, save/offline, and narrow-screen states.
 6. Implement the smallest responsive interaction that preserves keyboard and assistive-technology
    access.
 7. Verify Russian and longer future Kazakh text without fixed-width labels or clipped content.
@@ -32,7 +32,7 @@ Preserve compatibility where necessary and report the inconsistency.
 
 ## Non-negotiable direction
 
-- Prefer pale mineral surfaces, dark readable text, generous space, and restrained green accents.
+- Use pale mineral surfaces in light mode and deep low-glare mineral surfaces in dark mode, with generous space and restrained green accents.
 - Express futurism through precision, data, subtle motion, and dependable state feedback.
 - Do not create a dark neon cockpit, game HUD, cartoon Mars theme, or generic school dashboard.
 - Keep the experience serious but not adult, and welcoming but not childish.
@@ -66,7 +66,7 @@ For implementation work, verify at minimum:
 
 - keyboard navigation and visible focus;
 - accessible names and form labels;
-- contrast and non-colour status cues;
+- contrast and non-colour status cues in light and dark themes;
 - desktop, tablet, and narrow-screen layout;
 - loading, error, save, offline, and system-check feedback;
 - long Russian and representative Kazakh-length text;

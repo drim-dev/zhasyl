@@ -137,6 +137,7 @@ Also read `.agents/skills/database-ef-core/SKILL.md` for data-layer work.
 - Design for children without making the interface childish: clear hierarchy, readable type,
   limited choices, and immediate feedback.
 - Support phone, tablet, and desktop layouts.
+- Support complete light and dark themes through semantic tokens. Follow the system preference on first use, preserve an explicit device choice, and verify both themes.
 
 Before changing `frontend/`, read both:
 

@@ -75,19 +75,22 @@ ornamental JavaScript and heavy background effects.
 
 ## Visual language
 
-### Light-first environment
+### Light and dark environments
 
-The initial product is light-first. Most learning happens on pale mineral surfaces with dark ink
-and restrained green accents. Dark mode may be added later through semantic tokens, but it is not
-required for the first vertical slice.
+The product supports light and dark themes from the first implementation. The first visit
+follows the operating-system preference; an explicit learner choice is stored on that device.
+Both themes are complete product states, not a primary design plus a recoloured fallback.
 
-Use generous empty space, thin dividers, calm surfaces, and a small number of elevation levels.
-Avoid large areas of saturated colour.
+Light mode uses pale mineral surfaces with dark ink and restrained green accents. Dark mode uses
+deep low-glare mineral surfaces, soft light text, and the same semantic hierarchy. Dark mode must
+remain calm and readable; it must never become a neon cockpit, game HUD, or high-contrast science
+fiction skin.
 
-### Colour tokens
+Use generous empty space, thin dividers, calm surfaces, and a small number of elevation levels in
+both themes. Avoid large areas of saturated colour. Theme changes must preserve meaning, focus,
+data distinctions, and status visibility without a flash of the wrong theme during page load.
 
-These values establish the initial direction. Verify contrast in the implemented component and
-adjust through semantic tokens when necessary.
+### Light colour tokens
 
 | Token | Initial value | Use |
 | --- | --- | --- |
@@ -100,11 +103,32 @@ adjust through semantic tokens when necessary.
 | brand | #167052 | Primary actions and active navigation |
 | brand-accent | #1F8A62 | Larger accents, charts, and selected surfaces |
 | brand-soft | #DDF4E8 | Brand-tinted backgrounds |
+| on-brand | #FFFFFF | Text and icons on brand surfaces |
 | mars | #B45332 | Rare narrative or planetary accent |
 | info | #2F6F9F | Informational state |
 | warning | #8A5A12 | Warning state |
 | danger | #A33A3A | Error or destructive state |
 | focus | #2F6F9F | Keyboard focus ring |
+
+### Dark colour tokens
+
+| Token | Initial value | Use |
+| --- | --- | --- |
+| canvas | #0F1715 | Low-glare application background |
+| surface | #16211E | Reading and working surfaces |
+| surface-subtle | #1C2A26 | Quiet grouping and inactive regions |
+| text | #EDF5F1 | Primary text |
+| text-muted | #AABBB5 | Secondary text |
+| border | #30423C | Dividers and component outlines |
+| brand | #65D0A3 | Primary actions and active navigation |
+| brand-accent | #7CDBB1 | Larger accents, charts, and selected surfaces |
+| brand-soft | #1F3D32 | Brand-tinted backgrounds |
+| on-brand | #0B1713 | Text and icons on brand surfaces |
+| mars | #E28B6C | Rare narrative or planetary accent |
+| info | #83B8DF | Informational state and focus |
+| warning | #E2B96C | Warning state |
+| danger | #F09292 | Error or destructive state |
+| focus | #83B8DF | Keyboard focus ring |
 
 Green represents life, growth, active work, and the station identity. Mars orange is a supporting
 accent, not a second brand colour. Status colours must always be paired with text or an icon.
@@ -328,7 +352,8 @@ about the learner.
 Use semantic CSS custom properties as the stable design-token boundary. Components consume
 semantic tokens rather than raw colours.
 
-    :root {
+    :root,
+    [data-theme="light"] {
       --color-canvas: #f4f7f4;
       --color-surface: #ffffff;
       --color-surface-subtle: #eaf0ec;
@@ -338,11 +363,32 @@ semantic tokens rather than raw colours.
       --color-brand: #167052;
       --color-brand-accent: #1f8a62;
       --color-brand-soft: #ddf4e8;
+      --color-on-brand: #ffffff;
       --color-mars: #b45332;
       --color-focus: #2f6f9f;
       --radius-control: 0.625rem;
       --radius-panel: 0.875rem;
     }
+
+    [data-theme="dark"] {
+      --color-canvas: #0f1715;
+      --color-surface: #16211e;
+      --color-surface-subtle: #1c2a26;
+      --color-text: #edf5f1;
+      --color-text-muted: #aabbb5;
+      --color-border: #30423c;
+      --color-brand: #65d0a3;
+      --color-brand-accent: #7cdbb1;
+      --color-brand-soft: #1f3d32;
+      --color-on-brand: #0b1713;
+      --color-mars: #e28b6c;
+      --color-focus: #83b8df;
+    }
+
+Resolve the system preference before the first paint. Store an explicit device choice and do not
+let a later operating-system change override it. The toggle has a stable accessible name, while
+its tooltip describes
+the resulting action.
 
 Do not choose a component framework merely to obtain a visual style. Evaluate dependencies when
 the first vertical slice identifies a concrete need. Whatever styling approach is selected must
@@ -353,7 +399,7 @@ preserve server-first rendering, semantic tokens, accessibility, and the design 
 Before accepting a new screen or component, verify:
 
 - Is the primary learner action obvious?
-- Does the screen feel light and calm at first glance?
+- Does the screen feel calm and visually lightweight in both themes?
 - Is the futuristic quality functional rather than decorative?
 - Can story, science, learner work, and system evidence be distinguished?
 - Is the learner reading or coding at a comfortable size and line length?

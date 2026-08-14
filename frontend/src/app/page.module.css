@@ -1,0 +1,497 @@
+.page {
+  width: min(100% - 2rem, 78rem);
+  min-height: 100vh;
+  margin-inline: auto;
+}
+
+.topbar {
+  min-height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.stationIdentity {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: var(--radius-control);
+}
+
+.stationIdentity > span:last-child {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.stationIdentity strong {
+  font-size: 0.94rem;
+  letter-spacing: -0.01em;
+}
+
+.stationIdentity small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.stationMark {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-on-brand);
+  background: var(--color-brand);
+  border-radius: 0.75rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.themeToggle {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.themeToggle:hover {
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+  border-color: var(--color-brand);
+}
+
+.themeIcon {
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.connectionStatus {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 0.85rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.statusDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-brand-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.25rem var(--color-brand-soft);
+}
+
+.hero {
+  min-height: 36rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(19rem, 0.72fr);
+  align-items: center;
+  gap: clamp(3rem, 8vw, 7rem);
+  padding-block: clamp(4.5rem, 10vw, 8rem);
+}
+
+.heroContent {
+  max-width: 47rem;
+}
+
+.eyebrow {
+  color: var(--color-brand);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 46rem;
+  margin-top: 1.2rem;
+  font-size: clamp(2.65rem, 6vw, 5.35rem);
+  font-weight: 650;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+}
+
+.lead {
+  max-width: 42rem;
+  margin-top: 1.6rem;
+  color: var(--color-text-muted);
+  font-size: clamp(1rem, 1.6vw, 1.18rem);
+  line-height: 1.75;
+}
+
+.primaryAction {
+  width: fit-content;
+  min-height: 2.9rem;
+  margin-top: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.72rem 1rem;
+  color: var(--color-on-brand);
+  background: var(--color-brand);
+  border: 1px solid var(--color-brand);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 700;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.primaryAction:hover {
+  background: var(--color-brand-accent);
+}
+
+.primaryAction:active {
+  transform: translateY(1px);
+}
+
+.stationPriority {
+  position: relative;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.stationPriority::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.28rem;
+  content: "";
+  background: linear-gradient(90deg, var(--color-brand), var(--color-mars));
+}
+
+.priorityHeader,
+.missionLabel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.priorityCode {
+  color: var(--color-mars);
+}
+
+.stationPriority h2 {
+  margin-top: 2rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.stationPriority > p {
+  margin-top: 0.8rem;
+  color: var(--color-text-muted);
+  font-size: 0.91rem;
+}
+
+.stationFacts {
+  margin-top: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--color-border);
+}
+
+.stationFacts > div {
+  padding-top: 1rem;
+}
+
+.stationFacts dt {
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+}
+
+.stationFacts dd {
+  margin-top: 0.12rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.laboratories {
+  padding-block: clamp(4rem, 8vw, 7rem);
+  scroll-margin-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.sectionHeading {
+  display: grid;
+  grid-template-columns: 1fr minmax(18rem, 0.55fr);
+  align-items: end;
+  gap: 3rem;
+}
+
+.sectionHeading h2 {
+  margin-top: 0.55rem;
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  letter-spacing: -0.045em;
+  line-height: 1.1;
+}
+
+.sectionHeading > p {
+  color: var(--color-text-muted);
+}
+
+.laboratoryGrid {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.laboratoryCard {
+  min-height: 27rem;
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.cardIndex {
+  padding-top: 1.5rem;
+  color: var(--color-brand);
+  background: var(--color-surface-subtle);
+  border-right: 1px solid var(--color-border);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cardBody {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding: clamp(1.4rem, 3vw, 2rem);
+}
+
+.specialist {
+  color: var(--color-brand);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.laboratoryCard h3 {
+  margin-top: 1.25rem;
+  font-size: clamp(1.45rem, 2.5vw, 2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.purpose {
+  margin-top: 0.8rem;
+  color: var(--color-text-muted);
+  font-size: 0.92rem;
+}
+
+.missionPanel {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.missionLabel {
+  align-items: flex-start;
+}
+
+.missionStatus {
+  max-width: 12rem;
+  color: var(--color-warning);
+  text-align: right;
+}
+
+.missionPanel h4 {
+  margin-top: 1rem;
+  font-size: 1.08rem;
+  letter-spacing: -0.02em;
+}
+
+.missionPanel p {
+  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.footer {
+  min-height: 6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.statePage {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.statePanel {
+  width: min(100%, 34rem);
+  padding: clamp(1.5rem, 5vw, 3rem);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.statePanel h1 {
+  margin-top: 0.8rem;
+  font-size: clamp(1.7rem, 5vw, 2.5rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+}
+
+.statePanel > p:not(.eyebrow) {
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+}
+
+.loadingTrack {
+  height: 0.35rem;
+  margin-top: 2rem;
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+  border-radius: 999px;
+}
+
+.loadingTrack span {
+  width: 45%;
+  height: 100%;
+  display: block;
+  background: var(--color-brand);
+  animation: loading 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes loading {
+  from {
+    transform: translateX(-15%);
+  }
+
+  to {
+    transform: translateX(145%);
+  }
+}
+
+@media (max-width: 52rem) {
+  .hero,
+  .sectionHeading {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    gap: 3.5rem;
+    padding-block: 4.5rem;
+  }
+
+  .sectionHeading {
+    gap: 1.2rem;
+  }
+
+  .laboratoryGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 36rem) {
+  .page {
+    width: min(100% - 1.25rem, 78rem);
+  }
+
+  .topbar {
+    min-height: 4.75rem;
+  }
+
+  .stationIdentity small,
+  .connectionStatus {
+    display: none;
+  }
+
+  .hero h1 {
+    font-size: clamp(2.4rem, 13vw, 3.4rem);
+  }
+
+  .stationFacts {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+
+  .laboratoryCard {
+    min-height: auto;
+    grid-template-columns: 3rem 1fr;
+  }
+
+  .missionPanel {
+    margin-top: 2.5rem;
+  }
+
+  .missionLabel {
+    display: grid;
+  }
+
+  .missionStatus {
+    max-width: none;
+    text-align: left;
+  }
+
+  .footer {
+    min-height: 7rem;
+    display: grid;
+    align-content: center;
+    gap: 0.35rem;
+  }
+}
