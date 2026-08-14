@@ -101,7 +101,9 @@ Startup seeding runs in dependency order: station, laboratories, missions, then 
 
 Aspire orchestrates PostgreSQL 17 and Azure Storage emulation through Azurite. Both use named
 development volumes. The API receives the `zhasyl` PostgreSQL connection string and `blobs`
-storage reference through Aspire service discovery. Blob storage is wired but not consumed yet.
+storage reference through Aspire service discovery. The local AppHost, dashboard, telemetry, and
+resource service endpoints use HTTP and do not require a development certificate. Blob storage
+is wired but not consumed yet.
 
 ## Not Implemented Yet
 

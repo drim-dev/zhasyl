@@ -14,7 +14,6 @@ assignments. Local orchestration uses .NET Aspire.
 - Node.js 24.9.0
 - npm 11.6.0
 - Docker Desktop or another Docker-compatible runtime
-- an HTTPS development certificate is recommended for the Aspire dashboard
 
 The exact .NET and Node versions are declared in `global.json` and `.nvmrc`.
 
@@ -33,7 +32,9 @@ make dev
 Aspire starts PostgreSQL 17, Azurite, the API, and the frontend. It injects private service and
 storage addresses, applies EF Core migrations, seeds MDX content, and exposes the browser
 application at <http://localhost:3000>. The dashboard URL and login token are printed to the
-terminal. PostgreSQL and Azurite use named development volumes so their state survives restarts.
+terminal. The local dashboard and its internal control endpoints use HTTP, so no development
+certificate is required. PostgreSQL and Azurite use named development volumes so their state
+survives restarts.
 
 The frontend automatically copies the pinned Pyodide runtime into generated public assets before
 `dev` and `build`. Python then runs in a browser Web Worker without an external runtime CDN.

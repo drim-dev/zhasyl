@@ -5,7 +5,7 @@ restore:
 	npm ci --prefix frontend
 
 dev:
-	dotnet run --project Zhasyl.AppHost/Zhasyl.AppHost.csproj
+	dotnet run --project Zhasyl.AppHost/Zhasyl.AppHost.csproj --launch-profile http
 
 build:
 	dotnet build Zhasyl.sln
