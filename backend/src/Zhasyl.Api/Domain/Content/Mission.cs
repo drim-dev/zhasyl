@@ -9,6 +9,7 @@ public sealed class Mission
     public bool IsPublished { get; set; }
     public Laboratory Laboratory { get; set; } = null!;
     public ICollection<MissionRevision> Revisions { get; set; } = [];
+    public ICollection<StationAssignment> Assignments { get; set; } = [];
 }
 
 public sealed class MissionRevision

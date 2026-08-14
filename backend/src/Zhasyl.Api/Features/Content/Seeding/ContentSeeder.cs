@@ -18,6 +18,7 @@ public sealed class ContentSeeder(
         await SeedStationsAsync(documents, cancellationToken);
         await SeedLaboratoriesAsync(documents, cancellationToken);
         await SeedMissionsAsync(documents, cancellationToken);
+        await SeedAssignmentsAsync(documents, cancellationToken);
 
         logger.LogInformation("Seeded {Count} content documents.", documents.Count);
     }
@@ -194,6 +195,93 @@ public sealed class ContentSeeder(
                 Name = document.Title,
                 Problem = document.Problem!,
                 Status = document.Status!,
+                BodyMdx = document.BodyMdx,
+                ContentHash = document.ContentHash,
+                IsCurrent = true,
+                CreatedAt = now,
+                PublishedAt = document.IsPublished ? now : null,
+            });
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task SeedAssignmentsAsync(
+        IReadOnlyList<ContentSeedDocument> documents,
+        CancellationToken cancellationToken)
+    {
+        var assignmentDocuments = documents
+            .Where(document => document.Kind == ContentKind.Assignment)
+            .ToArray();
+
+        foreach (var document in assignmentDocuments)
+        {
+            var mission = await db.Missions.SingleOrDefaultAsync(
+                item =>
+                    item.Laboratory.Slug == document.Laboratory &&
+                    item.Slug == document.Mission,
+                cancellationToken) ?? throw MissingParent(document, "mission", document.Mission);
+
+            var assignment = await db.StationAssignments.SingleOrDefaultAsync(
+                item => item.MissionId == mission.Id && item.Slug == document.Slug,
+                cancellationToken);
+
+            if (assignment is null)
+            {
+                assignment = new StationAssignment
+                {
+                    Id = Guid.CreateVersion7(),
+                    MissionId = mission.Id,
+                    Slug = document.Slug,
+                    Order = document.Order,
+                    IsPublished = document.IsPublished,
+                };
+                db.StationAssignments.Add(assignment);
+            }
+            else
+            {
+                assignment.Order = document.Order;
+                assignment.IsPublished = document.IsPublished;
+            }
+        }
+
+        await db.SaveChangesAsync(cancellationToken);
+
+        foreach (var document in assignmentDocuments)
+        {
+            var assignment = await db.StationAssignments.SingleAsync(
+                item =>
+                    item.Mission.Laboratory.Slug == document.Laboratory &&
+                    item.Mission.Slug == document.Mission &&
+                    item.Slug == document.Slug,
+                cancellationToken);
+            var revisions = await db.StationAssignmentRevisions
+                .Where(item =>
+                    item.StationAssignmentId == assignment.Id &&
+                    item.Locale == document.Locale)
+                .ToListAsync(cancellationToken);
+            var current = revisions.SingleOrDefault(item => item.IsCurrent);
+
+            if (current?.ContentHash == document.ContentHash)
+            {
+                continue;
+            }
+
+            if (current is not null)
+            {
+                current.IsCurrent = false;
+            }
+
+            var now = timeProvider.GetUtcNow();
+            db.StationAssignmentRevisions.Add(new StationAssignmentRevision
+            {
+                Id = Guid.CreateVersion7(),
+                StationAssignmentId = assignment.Id,
+                Locale = document.Locale,
+                Version = revisions.Select(item => item.Version).DefaultIfEmpty().Max() + 1,
+                Name = document.Title,
+                Objective = document.Objective!,
+                EstimatedMinutes = document.EstimatedMinutes,
                 BodyMdx = document.BodyMdx,
                 ContentHash = document.ContentHash,
                 IsCurrent = true,

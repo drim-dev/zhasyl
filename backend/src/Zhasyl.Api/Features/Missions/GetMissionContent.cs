@@ -46,6 +46,15 @@ public static class GetMissionContent
         string MissionSlug,
         string Locale) : IRequest<Response?>;
 
+    public sealed record AssignmentSummary(
+        string AssignmentId,
+        Guid RevisionId,
+        int Version,
+        int Order,
+        string Name,
+        string Objective,
+        int EstimatedMinutes);
+
     public sealed record Response(
         string LaboratoryId,
         string LaboratoryName,
@@ -56,7 +65,8 @@ public static class GetMissionContent
         string Name,
         string Problem,
         string Status,
-        string BodyMdx);
+        string BodyMdx,
+        IReadOnlyList<AssignmentSummary> Assignments);
 
     public sealed class RequestValidator : AbstractValidator<Request>
     {
@@ -94,6 +104,7 @@ public static class GetMissionContent
                 {
                     LaboratoryKey = item.Mission.Laboratory.Slug,
                     LaboratoryEntityId = item.Mission.LaboratoryId,
+                    MissionEntityId = item.MissionId,
                     MissionId = item.Mission.Slug,
                     RevisionId = item.Id,
                     item.Version,
@@ -118,19 +129,42 @@ public static class GetMissionContent
                 .Select(item => item.Name)
                 .SingleOrDefaultAsync(cancellationToken);
 
-            return laboratoryName is null
-                ? null
-                : new Response(
-                    revision.LaboratoryKey,
-                    laboratoryName,
-                    revision.MissionId,
-                    revision.RevisionId,
-                    revision.Version,
-                    revision.Locale,
-                    revision.Name,
-                    revision.Problem,
-                    revision.Status,
-                    revision.BodyMdx);
+            if (laboratoryName is null)
+            {
+                return null;
+            }
+
+            var assignments = await db.StationAssignmentRevisions
+                .AsNoTracking()
+                .Where(item =>
+                    item.StationAssignment.MissionId == revision.MissionEntityId &&
+                    item.StationAssignment.IsPublished &&
+                    item.Locale == request.Locale &&
+                    item.IsCurrent &&
+                    item.PublishedAt != null)
+                .OrderBy(item => item.StationAssignment.Order)
+                .Select(item => new AssignmentSummary(
+                    item.StationAssignment.Slug,
+                    item.Id,
+                    item.Version,
+                    item.StationAssignment.Order,
+                    item.Name,
+                    item.Objective,
+                    item.EstimatedMinutes))
+                .ToListAsync(cancellationToken);
+
+            return new Response(
+                revision.LaboratoryKey,
+                laboratoryName,
+                revision.MissionId,
+                revision.RevisionId,
+                revision.Version,
+                revision.Locale,
+                revision.Name,
+                revision.Problem,
+                revision.Status,
+                revision.BodyMdx,
+                assignments);
         }
     }
 }

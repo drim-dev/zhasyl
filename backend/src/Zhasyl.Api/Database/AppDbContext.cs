@@ -11,6 +11,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbCon
     public DbSet<LaboratoryTranslation> LaboratoryTranslations => Set<LaboratoryTranslation>();
     public DbSet<Mission> Missions => Set<Mission>();
     public DbSet<MissionRevision> MissionRevisions => Set<MissionRevision>();
+    public DbSet<StationAssignment> StationAssignments => Set<StationAssignment>();
+    public DbSet<StationAssignmentRevision> StationAssignmentRevisions => Set<StationAssignmentRevision>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

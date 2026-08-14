@@ -1,7 +1,7 @@
 # Platform Foundation
 
-The platform foundation serves localized Station content through a server-rendered Next.js
-application backed by a private ASP.NET Core API. PostgreSQL is the runtime source of truth;
+The platform serves localized Station content through a server-rendered Next.js application
+backed by a private ASP.NET Core API. PostgreSQL is the runtime source of truth;
 repository-owned MDX files are idempotently seeded on startup.
 
 ## Data Model
@@ -12,65 +12,105 @@ repository-owned MDX files are idempotently seeded on startup.
 | Laboratory | UUID, station, slug, order, publication state | Name, purpose, and specialist per locale |
 | Mission | UUID, laboratory, slug, order, publication state | Immutable numbered revisions per locale |
 | Mission revision | UUID, mission, locale, version | Name, problem, status, raw MDX, hash, and publication timestamps |
+| Station assignment | UUID, mission, slug, order, publication state | Immutable numbered revisions per locale |
+| Assignment revision | UUID, assignment, locale, version | Name, objective, estimated minutes, raw MDX, hash, and publication timestamps |
 
-Exactly one mission revision may be current for a mission and locale. A learner workspace can
-later pin the revision UUID rather than silently changing when authored content is updated.
+Exactly one mission revision and one assignment revision may be current for each stable identity
+and locale. Future learner evidence can pin revision UUIDs rather than silently changing when
+authored content is updated.
 
 ## API Endpoints
 
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | /api/station/overview?locale=ru | Anonymous | Returns the published station and laboratory overview |
-| GET | /api/laboratories/{laboratorySlug}/missions/{missionSlug}?locale=ru | Anonymous | Returns the current published MDX revision |
+| GET | /api/laboratories/{laboratorySlug}/missions/{missionSlug}?locale=ru | Anonymous | Returns the current mission revision and ordered assignment summaries |
+| GET | /api/laboratories/{laboratorySlug}/missions/{missionSlug}/assignments/{assignmentSlug}?locale=ru | Anonymous | Returns the current assignment revision |
 | GET | /health | Anonymous in development | Reports readiness |
 | GET | /alive | Anonymous in development | Reports process liveness |
 
 The content endpoints are private application APIs consumed by the Next.js BFF. Authentication
-will be added before learner state is introduced.
+will be added before server-side learner state is introduced.
 
-## Key Behaviors
+## Authored Content and MDX
 
 - Russian (`ru`) is the only authored and published locale.
-- An omitted locale defaults to Russian.
-- Locale-neutral station, laboratory, mission, and revision IDs do not contain translated text.
-- A syntactically valid future locale such as `kk` requires no code change; it returns HTTP 404
-  with `content:locale:read:not_published` until matching content is seeded.
-- Invalid locale and slug values return HTTP 400 validation Problem Details with stable codes.
-- Missing or unpublished mission content returns HTTP 404 with
-  `content:mission:read:not_found`.
-- Unexpected API failures return HTTP 500 Problem Details with a trace identifier and the stable
-  error code `platform:request:execute:unexpected_failure`.
-- The browser accesses the product through Next.js. The station page reads the API only on the
-  server.
-- The overview presents the bioinformatics and materials laboratories as independent choices.
-- BioScout and Sealant No. 17 are shown as the first published mission shells.
-- The page provides explicit loading, load-error, and not-found states.
-- The page supports keyboard navigation and desktop, tablet, and narrow-screen layouts.
-- The interface provides complete light and dark themes through Station semantic design tokens.
-- The first visit follows the operating-system theme; a manual theme choice is stored on the
-  device and applied before the first paint.
+- Locale-neutral station, laboratory, mission, and assignment IDs do not contain translated text.
+- Authored files follow the logical hierarchy under `content/{locale}/`.
+- Mission and assignment pages are server-rendered from the exact revision returned by the API.
+- Repository-authored MDX is trusted content, but it is still constrained before evaluation.
+- The AST validator rejects ESM imports, JavaScript expressions, raw HTML, expression-valued
+  attributes, and unknown JSX components.
+- The renderer exposes only Station learning primitives and explicitly registered visualizations.
+- External links accept HTTP or HTTPS only and open with an isolated browsing context.
+- GitHub-flavoured Markdown tables render as semantic tables.
+
+The current component allow-list includes station messages, researcher notes, prediction prompts,
+three-level hints, system criteria, journal prompts, figures, two mission visualizations, and the
+Python workbench. Visualizations use semantic HTML controls, work in both themes, and provide a
+table or textual alternative for essential information.
+
+Arbitrary administrative or learner-authored MDX must not pass through this renderer. Adding a
+content authoring UI requires a separate sanitisation and trust design.
+
+## Browser Python Workspace
+
+Both published assignments contain a runnable Python workspace:
+
+- Pyodide runs inside a native module Web Worker, not on the UI thread;
+- the Python runtime, standard library, and WebAssembly files are served by the application;
+- `npm run sync:pyodide` copies the pinned package assets before development and production builds;
+- a run can be stopped by terminating the worker and is terminated automatically after 45 seconds;
+- stdout, stderr, and Python exceptions appear in the assignment output panel;
+- stable check codes are evaluated deterministically from source and observed output;
+- the current draft is stored in browser local storage under a stable assignment key;
+- reloading the same browser restores that draft.
+
+This workspace is an executable product slice, not the final durable workspace. It does not yet
+sync to PostgreSQL or Blob Storage, resume on a second device, export files, record evidence, or
+provide JupyterLite notebooks. The UI labels its state as local browser storage and does not claim
+server persistence.
+
+## Interface
+
+- The overview presents bioinformatics and materials as independent laboratory choices.
+- Each laboratory card links to a mission reader and its ordered assignments.
+- BioScout and Sealant No. 17 each publish one complete first assignment draft.
+- Mission and assignment routes provide loading, unexpected-error, and not-found states.
+- The interface supports keyboard navigation and desktop, tablet, and narrow-screen layouts.
+- Light and dark themes use shared Station semantic tokens.
+- The first visit follows the operating-system theme; a manual choice is stored on the device and
+  applied without a hydration mismatch.
+- Figures can be expanded through a keyboard-accessible dialog and remain usable at narrow widths.
 
 ## Content Seeding
 
-Authoring files live under `content/` and declare the `zhasyl.content/v1` frontmatter schema.
-Startup seeding runs in dependency order: station, laboratories, missions, then mission revisions.
+Startup seeding runs in dependency order: station, laboratories, missions, then assignments.
 
 - Station and laboratory translations are updated in place by locale.
-- Mission metadata is updated in place without changing its stable identity.
-- An unchanged mission content hash does not create another revision.
-- Changed frontmatter or MDX creates the next numbered revision and keeps prior revisions.
-- Invalid frontmatter, empty mission bodies, or missing parent references stop initialization.
-- Source files are copied into API build and publish output, so the same seeder works in local and
-  deployed environments.
+- Mission and assignment metadata are updated without changing stable identities.
+- An unchanged content hash does not create another revision.
+- Changed frontmatter or MDX creates the next immutable numbered revision and keeps prior revisions.
+- Mission and assignment revisions are versioned independently.
+- Invalid frontmatter, empty versioned bodies, non-positive order or estimated time, and missing
+  parent references stop initialization.
+- Source files are copied into API build and publish output.
+- Removing a source file does not currently unpublish persisted content.
 
 ## Local Infrastructure
 
 Aspire orchestrates PostgreSQL 17 and Azure Storage emulation through Azurite. Both use named
 development volumes. The API receives the `zhasyl` PostgreSQL connection string and `blobs`
-storage reference through Aspire service discovery. Blob storage is wired but not consumed until
-learner workspace persistence is implemented.
+storage reference through Aspire service discovery. Blob storage is wired but not consumed yet.
 
-## Authentication and Learner Persistence
+## Not Implemented Yet
 
-Social authentication, child pairing, learner workspaces, progress, and blob-backed files are not
-present in this foundation.
+- social authentication and adult accounts;
+- child profiles, pairing, and revocable device sessions;
+- server-side workspaces and cross-device restore;
+- authoritative check-run and evidence persistence;
+- progress and mission unlocking;
+- reflections stored outside the learner's own notes;
+- adult session summaries;
+- JupyterLite scientific journals;
+- reviewed Kazakh interface catalogs and authored content.

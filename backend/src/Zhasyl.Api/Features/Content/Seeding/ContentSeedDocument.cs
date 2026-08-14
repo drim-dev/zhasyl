@@ -4,7 +4,8 @@ public enum ContentKind
 {
     Station,
     Laboratory,
-    Mission
+    Mission,
+    Assignment
 }
 
 public sealed record ContentSeedDocument(
@@ -13,6 +14,7 @@ public sealed record ContentSeedDocument(
     string Locale,
     string? Station,
     string? Laboratory,
+    string? Mission,
     int Order,
     string Title,
     string? Location,
@@ -21,6 +23,8 @@ public sealed record ContentSeedDocument(
     string? Specialist,
     string? Problem,
     string? Status,
+    string? Objective,
+    int EstimatedMinutes,
     bool IsPublished,
     string BodyMdx,
     string ContentHash,

@@ -69,17 +69,22 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
                 Require(metadata.Station, "station", location);
                 Require(metadata.Purpose, "purpose", location);
                 Require(metadata.Specialist, "specialist", location);
-                RequirePositiveOrder(metadata.Order, location);
+                RequirePositive(metadata.Order, "order", location);
                 break;
             case ContentKind.Mission:
                 Require(metadata.Laboratory, "laboratory", location);
                 Require(metadata.Problem, "problem", location);
                 Require(metadata.Status, "status", location);
-                RequirePositiveOrder(metadata.Order, location);
-                if (string.IsNullOrWhiteSpace(body))
-                {
-                    throw new InvalidDataException($"Mission content file '{location}' has an empty MDX body.");
-                }
+                RequirePositive(metadata.Order, "order", location);
+                RequireBody(body, "Mission", location);
+                break;
+            case ContentKind.Assignment:
+                Require(metadata.Laboratory, "laboratory", location);
+                Require(metadata.Mission, "mission", location);
+                Require(metadata.Objective, "objective", location);
+                RequirePositive(metadata.Order, "order", location);
+                RequirePositive(metadata.EstimatedMinutes, "estimatedMinutes", location);
+                RequireBody(body, "Assignment", location);
                 break;
             default:
                 throw new InvalidDataException($"Content file '{location}' has an unsupported kind.");
@@ -94,6 +99,7 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
             metadata.Locale!.Trim().ToLowerInvariant(),
             metadata.Station?.Trim(),
             metadata.Laboratory?.Trim(),
+            metadata.Mission?.Trim(),
             metadata.Order,
             metadata.Title!.Trim(),
             metadata.Location?.Trim(),
@@ -102,6 +108,8 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
             metadata.Specialist?.Trim(),
             metadata.Problem?.Trim(),
             metadata.Status?.Trim(),
+            metadata.Objective?.Trim(),
+            metadata.EstimatedMinutes,
             metadata.IsPublished,
             body.Trim(),
             hash,
@@ -139,11 +147,20 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
         }
     }
 
-    private static void RequirePositiveOrder(int order, string location)
+    private static void RequirePositive(int value, string field, string location)
     {
-        if (order <= 0)
+        if (value <= 0)
         {
-            throw new InvalidDataException($"Content file '{location}' must have a positive order.");
+            throw new InvalidDataException(
+                $"Content file '{location}' must have a positive '{field}'.");
+        }
+    }
+
+    private static void RequireBody(string body, string kind, string location)
+    {
+        if (string.IsNullOrWhiteSpace(body))
+        {
+            throw new InvalidDataException($"{kind} content file '{location}' has an empty MDX body.");
         }
     }
 
@@ -155,6 +172,7 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
         public string? Locale { get; set; }
         public string? Station { get; set; }
         public string? Laboratory { get; set; }
+        public string? Mission { get; set; }
         public int Order { get; set; }
         public string? Title { get; set; }
         public string? Location { get; set; }
@@ -163,6 +181,8 @@ public sealed class MarkdownContentSeedSource(IOptions<ContentOptions> options) 
         public string? Specialist { get; set; }
         public string? Problem { get; set; }
         public string? Status { get; set; }
+        public string? Objective { get; set; }
+        public int EstimatedMinutes { get; set; }
         public bool IsPublished { get; set; } = true;
     }
 }

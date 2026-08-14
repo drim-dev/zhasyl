@@ -1,17 +1,24 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 import styles from "@/app/page.module.css";
 
+const subscribe = (): (() => void) => () => undefined;
+
 export function ThemeToggle(): React.ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
-  const isDark = resolvedTheme === "dark";
-  const title =
-    resolvedTheme === undefined
-      ? "Сменить цветовую тему"
-      : isDark
-        ? "Включить светлую тему"
-        : "Включить тёмную тему";
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false,
+  );
+  const isDark = mounted && resolvedTheme === "dark";
+  const title = !mounted
+    ? "Сменить цветовую тему"
+    : isDark
+      ? "Включить светлую тему"
+      : "Включить тёмную тему";
 
   const toggleTheme = (): void => {
     const activeTheme =

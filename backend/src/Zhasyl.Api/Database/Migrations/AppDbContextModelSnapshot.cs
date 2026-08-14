@@ -194,6 +194,97 @@ namespace Zhasyl.Api.Database.Migrations
                     b.ToTable("stations", (string)null);
                 });
 
+            modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("MissionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MissionId", "Order")
+                        .IsUnique();
+
+                    b.HasIndex("MissionId", "Slug")
+                        .IsUnique();
+
+                    b.ToTable("station_assignments", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignmentRevision", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BodyMdx")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EstimatedMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Objective")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTimeOffset?>("PublishedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("StationAssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StationAssignmentId", "Locale")
+                        .IsUnique()
+                        .HasFilter("\"IsCurrent\"");
+
+                    b.HasIndex("StationAssignmentId", "Locale", "Version")
+                        .IsUnique();
+
+                    b.ToTable("station_assignment_revisions", (string)null);
+                });
+
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationTranslation", b =>
                 {
                     b.Property<Guid>("StationId")
@@ -267,6 +358,28 @@ namespace Zhasyl.Api.Database.Migrations
                     b.Navigation("Mission");
                 });
 
+            modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignment", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Content.Mission", "Mission")
+                        .WithMany("Assignments")
+                        .HasForeignKey("MissionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Mission");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignmentRevision", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Content.StationAssignment", "StationAssignment")
+                        .WithMany("Revisions")
+                        .HasForeignKey("StationAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("StationAssignment");
+                });
+
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationTranslation", b =>
                 {
                     b.HasOne("Zhasyl.Api.Domain.Content.Station", "Station")
@@ -287,6 +400,8 @@ namespace Zhasyl.Api.Database.Migrations
 
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.Mission", b =>
                 {
+                    b.Navigation("Assignments");
+
                     b.Navigation("Revisions");
                 });
 
@@ -295,6 +410,11 @@ namespace Zhasyl.Api.Database.Migrations
                     b.Navigation("Laboratories");
 
                     b.Navigation("Translations");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignment", b =>
+                {
+                    b.Navigation("Revisions");
                 });
 #pragma warning restore 612, 618
         }

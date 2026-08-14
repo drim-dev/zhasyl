@@ -104,3 +104,48 @@ public sealed class MissionRevisionConfiguration : IEntityTypeConfiguration<Miss
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+public sealed class StationAssignmentConfiguration : IEntityTypeConfiguration<StationAssignment>
+{
+    public void Configure(EntityTypeBuilder<StationAssignment> builder)
+    {
+        builder.ToTable("station_assignments");
+        builder.HasKey(assignment => assignment.Id);
+        builder.Property(assignment => assignment.Slug).HasMaxLength(100).IsRequired();
+        builder.HasIndex(assignment => new { assignment.MissionId, assignment.Slug }).IsUnique();
+        builder.HasIndex(assignment => new { assignment.MissionId, assignment.Order }).IsUnique();
+        builder.HasOne(assignment => assignment.Mission)
+            .WithMany(mission => mission.Assignments)
+            .HasForeignKey(assignment => assignment.MissionId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public sealed class StationAssignmentRevisionConfiguration
+    : IEntityTypeConfiguration<StationAssignmentRevision>
+{
+    public void Configure(EntityTypeBuilder<StationAssignmentRevision> builder)
+    {
+        builder.ToTable("station_assignment_revisions");
+        builder.HasKey(revision => revision.Id);
+        builder.Property(revision => revision.Locale).HasMaxLength(16).IsRequired();
+        builder.Property(revision => revision.Name).HasMaxLength(200).IsRequired();
+        builder.Property(revision => revision.Objective).HasMaxLength(2_000).IsRequired();
+        builder.Property(revision => revision.BodyMdx).IsRequired();
+        builder.Property(revision => revision.ContentHash).HasMaxLength(64).IsRequired();
+        builder.HasIndex(revision => new
+        {
+            revision.StationAssignmentId,
+            revision.Locale,
+            revision.Version,
+        })
+            .IsUnique();
+        builder.HasIndex(revision => new { revision.StationAssignmentId, revision.Locale })
+            .IsUnique()
+            .HasFilter("\"IsCurrent\"");
+        builder.HasOne(revision => revision.StationAssignment)
+            .WithMany(assignment => assignment.Revisions)
+            .HasForeignKey(revision => revision.StationAssignmentId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}

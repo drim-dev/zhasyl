@@ -15,7 +15,7 @@ public sealed class GetMissionContentTests : IClassFixture<ZhasylApplicationFact
     }
 
     [Fact]
-    public async Task Should_return_the_current_published_mdx_revision()
+    public async Task Should_return_the_current_published_mdx_revision_and_assignments()
     {
         var response = await client.GetAsync(
             "/api/laboratories/bioinformatics/missions/bioscout?locale=ru");
@@ -27,7 +27,11 @@ public sealed class GetMissionContentTests : IClassFixture<ZhasylApplicationFact
         Assert.Equal("bioscout", mission.MissionId);
         Assert.Equal(1, mission.Version);
         Assert.NotEqual(Guid.Empty, mission.RevisionId);
-        Assert.Contains("формате FASTA", mission.BodyMdx);
+        Assert.Contains("FASTA-файла", mission.BodyMdx);
+        var assignment = Assert.Single(mission.Assignments);
+        Assert.Equal("check-sequence", assignment.AssignmentId);
+        Assert.Equal(60, assignment.EstimatedMinutes);
+        Assert.NotEqual(Guid.Empty, assignment.RevisionId);
     }
 
     [Fact]

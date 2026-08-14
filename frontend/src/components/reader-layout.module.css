@@ -1,0 +1,378 @@
+.page {
+  width: min(100% - 2rem, 78rem);
+  min-height: 100vh;
+  margin-inline: auto;
+}
+
+.topbar {
+  min-height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stationIdentity {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.875rem;
+  border-radius: var(--radius-control);
+}
+
+.stationIdentity > span:last-child {
+  display: grid;
+  gap: 0.05rem;
+}
+
+.stationIdentity strong {
+  font-size: 0.94rem;
+}
+
+.stationIdentity small {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.stationMark {
+  width: 2.75rem;
+  height: 2.75rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-on-brand);
+  background: var(--color-brand);
+  border-radius: 0.75rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.headerControls {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.connectionStatus {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 0.85rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.connectionStatus span {
+  width: 0.5rem;
+  height: 0.5rem;
+  background: var(--color-brand-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0.25rem var(--color-brand-soft);
+}
+
+.breadcrumbs {
+  min-height: 4.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.breadcrumbs a:hover {
+  color: var(--color-brand);
+}
+
+.missionHero,
+.assignmentHero {
+  padding-block: clamp(3.5rem, 8vw, 6.5rem);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.missionHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.42fr);
+  align-items: end;
+  gap: clamp(3rem, 8vw, 7rem);
+}
+
+.eyebrow {
+  color: var(--color-brand);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.71rem;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.missionHero h1,
+.assignmentHero h1 {
+  max-width: 52rem;
+  margin-top: 0.8rem;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 650;
+  letter-spacing: -0.055em;
+  line-height: 1.03;
+}
+
+.lead {
+  max-width: 48rem;
+  margin-top: 1.25rem;
+  color: var(--color-text-muted);
+  font-size: clamp(1rem, 1.6vw, 1.16rem);
+  line-height: 1.7;
+}
+
+.primaryAction {
+  width: fit-content;
+  min-height: 3rem;
+  margin-top: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-inline: 1rem;
+  color: var(--color-on-brand);
+  background: var(--color-brand);
+  border-radius: var(--radius-control);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.primaryAction:hover {
+  background: var(--color-brand-accent);
+}
+
+.missionFacts {
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.missionFacts > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.7rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.missionFacts > div:last-child {
+  border-bottom: 0;
+}
+
+.missionFacts dt {
+  color: var(--color-text-muted);
+  font-size: 0.73rem;
+}
+
+.missionFacts dd {
+  text-align: right;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.76rem;
+  font-weight: 750;
+}
+
+.missionGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(19rem, 0.42fr);
+  align-items: start;
+  gap: clamp(3rem, 7vw, 6rem);
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.missionBody {
+  min-width: 0;
+}
+
+.assignmentRail {
+  position: sticky;
+  top: 1rem;
+  padding: 1.25rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.assignmentRail h2 {
+  margin-top: 0.35rem;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.assignmentRail ol {
+  margin-top: 1.25rem;
+  list-style: none;
+}
+
+.assignmentRail li {
+  display: grid;
+  grid-template-columns: 2.4rem 1fr;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.assignmentNumber {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: grid;
+  place-items: center;
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+  border-radius: 0.55rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+.assignmentRail h3 {
+  font-size: 0.95rem;
+}
+
+.assignmentRail li p {
+  margin-top: 0.4rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.assignmentRail li div > span {
+  margin-top: 0.6rem;
+  display: block;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+}
+
+.assignmentRail li a {
+  min-height: 2.75rem;
+  margin-top: 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-brand);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.emptyState {
+  margin-top: 1rem;
+  color: var(--color-text-muted);
+}
+
+.assignmentHero {
+  max-width: 60rem;
+}
+
+.assignmentMeta {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.assignmentMeta span {
+  padding: 0.38rem 0.65rem;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+}
+
+.assignmentBody {
+  width: min(100%, 64rem);
+  margin-inline: auto;
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+}
+
+.assignmentFooter {
+  min-height: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.assignmentFooter strong {
+  margin-top: 0.2rem;
+  display: block;
+}
+
+.assignmentFooter a {
+  min-height: 2.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 0.9rem;
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+  border-radius: var(--radius-control);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.footer {
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+}
+
+@media (max-width: 58rem) {
+  .missionHero,
+  .missionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .assignmentRail {
+    position: static;
+  }
+}
+
+@media (max-width: 42rem) {
+  .page {
+    width: min(100% - 1.25rem, 78rem);
+  }
+
+  .topbar {
+    min-height: 4.75rem;
+  }
+
+  .connectionStatus,
+  .stationIdentity small {
+    display: none;
+  }
+
+  .missionHero h1,
+  .assignmentHero h1 {
+    font-size: clamp(2.3rem, 13vw, 3.6rem);
+  }
+
+  .assignmentFooter {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .assignmentFooter a {
+    width: 100%;
+    justify-content: center;
+  }
+}

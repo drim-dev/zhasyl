@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
 import type { StationOverview } from "@/types/station";
 import styles from "@/app/page.module.css";
@@ -37,8 +38,7 @@ export function StationOverviewView({
           <h1>Выбери задачу, которая важна для жизни на Марсе</h1>
           <p className={styles.lead}>{overview.briefing}</p>
           <a className={styles.primaryAction} href="#laboratories">
-            Посмотреть лаборатории
-            <span aria-hidden="true">↓</span>
+            Посмотреть лаборатории <span aria-hidden="true">↓</span>
           </a>
         </div>
 
@@ -91,6 +91,7 @@ export function StationOverviewView({
         <div className={styles.laboratoryGrid}>
           {overview.laboratories.map((laboratory, index) => {
             const titleId = `laboratory-${laboratory.id}-title`;
+            const missionHref = `/laboratories/${laboratory.id}/missions/${laboratory.firstMission.id}`;
 
             return (
               <article
@@ -117,6 +118,9 @@ export function StationOverviewView({
                     </div>
                     <h4>{laboratory.firstMission.name}</h4>
                     <p>{laboratory.firstMission.problem}</p>
+                    <Link className={styles.missionAction} href={missionHref}>
+                      Открыть миссию <span aria-hidden="true">→</span>
+                    </Link>
                   </div>
                 </div>
               </article>

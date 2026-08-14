@@ -9,6 +9,24 @@ The slice is successful when a paired child browser can open one BioScout assign
 Sealant No. 17 assignment, run Python, receive a deterministic check, save work durably, resume it,
 and produce a factual adult summary.
 
+## Current Implementation Checkpoint
+
+The agent-free content and execution checkpoint is implemented:
+
+- both first assignments render from independently versioned Russian MDX revisions;
+- both assignments include theory, scientific boundaries, prediction, three hints, reflection,
+  primary-source provenance, and an applied Station consequence;
+- accessible interactive visualizations render through a constrained MDX component allow-list;
+- locally served Pyodide runs editable Python in a terminable browser worker;
+- deterministic preview checks use stable codes and observable output;
+- a draft restores after refresh in the same browser;
+- Playwright covers both assignments, both themes, and desktop, tablet, and mobile reading layouts.
+
+The complete vertical slice is not finished. Adult authentication, child pairing, durable backend
+workspace versions, second-device restore, authoritative check evidence, reflections, progression,
+JupyterLite, and the adult summary remain in the plan below. Local browser storage and client-side
+preview checks must not be treated as substitutes for those application use cases.
+
 ## Slice boundaries
 
 ### Included

@@ -359,6 +359,21 @@
   font-size: 0.88rem;
 }
 
+.missionAction {
+  min-height: 2.75rem;
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-brand);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.missionAction:hover {
+  color: var(--color-brand-accent);
+}
+
 .footer {
   min-height: 6rem;
   display: flex;
