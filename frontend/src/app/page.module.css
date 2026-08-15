@@ -19,6 +19,22 @@
   gap: 0.65rem;
 }
 
+.accessLink {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 0.75rem;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-control);
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.accessLink:hover {
+  color: var(--color-brand);
+  background: var(--color-brand-soft);
+}
+
 .stationIdentity {
   min-height: 2.75rem;
   display: inline-flex;

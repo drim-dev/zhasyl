@@ -314,6 +314,250 @@ namespace Zhasyl.Api.Database.Migrations
                     b.ToTable("station_translations", (string)null);
                 });
 
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.AdultAccount", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("PreferredLocale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("adult_accounts", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.ChildDeviceSession", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChildProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("ChildProfileId", "ExpiresAt");
+
+                    b.ToTable("child_device_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.ChildProfile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AdultAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.Property<string>("LearningLocale")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("character varying(16)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdultAccountId", "DisplayName")
+                        .IsUnique();
+
+                    b.ToTable("child_profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.DevicePairingCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChildProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTimeOffset?>("UsedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CodeHash")
+                        .IsUnique();
+
+                    b.HasIndex("ChildProfileId", "ExpiresAt");
+
+                    b.ToTable("device_pairing_codes", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.OAuthIdentity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AdultAccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("LinkedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Provider")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("ProviderEmail")
+                        .IsRequired()
+                        .HasMaxLength(320)
+                        .HasColumnType("character varying(320)");
+
+                    b.Property<string>("ProviderSubject")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdultAccountId");
+
+                    b.HasIndex("Provider", "ProviderSubject")
+                        .IsUnique();
+
+                    b.ToTable("oauth_identities", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Learning.LearnerWorkspace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssignmentRevisionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChildProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("CurrentVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("StationAssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentRevisionId");
+
+                    b.HasIndex("StationAssignmentId");
+
+                    b.HasIndex("ChildProfileId", "StationAssignmentId")
+                        .IsUnique();
+
+                    b.ToTable("learner_workspaces", (string)null);
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Learning.WorkspaceSnapshot", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BlobName")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<int>("ByteLength")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("LearnerWorkspaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LearnerWorkspaceId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("workspace_snapshots", (string)null);
+                });
+
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.Laboratory", b =>
                 {
                     b.HasOne("Zhasyl.Api.Domain.Content.Station", "Station")
@@ -391,6 +635,88 @@ namespace Zhasyl.Api.Database.Migrations
                     b.Navigation("Station");
                 });
 
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.ChildDeviceSession", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Identity.ChildProfile", "ChildProfile")
+                        .WithMany("DeviceSessions")
+                        .HasForeignKey("ChildProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildProfile");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.ChildProfile", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Identity.AdultAccount", "AdultAccount")
+                        .WithMany("ChildProfiles")
+                        .HasForeignKey("AdultAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdultAccount");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.DevicePairingCode", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Identity.ChildProfile", "ChildProfile")
+                        .WithMany("PairingCodes")
+                        .HasForeignKey("ChildProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildProfile");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.OAuthIdentity", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Identity.AdultAccount", "AdultAccount")
+                        .WithMany("OAuthIdentities")
+                        .HasForeignKey("AdultAccountId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdultAccount");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Learning.LearnerWorkspace", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Content.StationAssignmentRevision", "AssignmentRevision")
+                        .WithMany()
+                        .HasForeignKey("AssignmentRevisionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Zhasyl.Api.Domain.Identity.ChildProfile", "ChildProfile")
+                        .WithMany("Workspaces")
+                        .HasForeignKey("ChildProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Zhasyl.Api.Domain.Content.StationAssignment", "StationAssignment")
+                        .WithMany()
+                        .HasForeignKey("StationAssignmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssignmentRevision");
+
+                    b.Navigation("ChildProfile");
+
+                    b.Navigation("StationAssignment");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Learning.WorkspaceSnapshot", b =>
+                {
+                    b.HasOne("Zhasyl.Api.Domain.Learning.LearnerWorkspace", "LearnerWorkspace")
+                        .WithMany("Snapshots")
+                        .HasForeignKey("LearnerWorkspaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LearnerWorkspace");
+                });
+
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.Laboratory", b =>
                 {
                     b.Navigation("Missions");
@@ -415,6 +741,27 @@ namespace Zhasyl.Api.Database.Migrations
             modelBuilder.Entity("Zhasyl.Api.Domain.Content.StationAssignment", b =>
                 {
                     b.Navigation("Revisions");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.AdultAccount", b =>
+                {
+                    b.Navigation("ChildProfiles");
+
+                    b.Navigation("OAuthIdentities");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Identity.ChildProfile", b =>
+                {
+                    b.Navigation("DeviceSessions");
+
+                    b.Navigation("PairingCodes");
+
+                    b.Navigation("Workspaces");
+                });
+
+            modelBuilder.Entity("Zhasyl.Api.Domain.Learning.LearnerWorkspace", b =>
+                {
+                    b.Navigation("Snapshots");
                 });
 #pragma warning restore 612, 618
         }

@@ -24,6 +24,9 @@ export function StationOverviewView({
         </a>
 
         <div className={styles.headerControls}>
+          <Link className={styles.accessLink} href="/connect">
+            Доступ
+          </Link>
           <div className={styles.connectionStatus} role="status">
             <span className={styles.statusDot} aria-hidden="true" />
             Связь установлена

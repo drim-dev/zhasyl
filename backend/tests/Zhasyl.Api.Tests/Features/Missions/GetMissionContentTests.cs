@@ -27,7 +27,7 @@ public sealed class GetMissionContentTests : IClassFixture<ZhasylApplicationFact
         Assert.Equal("bioscout", mission.MissionId);
         Assert.Equal(1, mission.Version);
         Assert.NotEqual(Guid.Empty, mission.RevisionId);
-        Assert.Contains("FASTA-файла", mission.BodyMdx);
+        Assert.Contains("биологической последовательностью", mission.BodyMdx);
         var assignment = Assert.Single(mission.Assignments);
         Assert.Equal("check-sequence", assignment.AssignmentId);
         Assert.Equal(60, assignment.EstimatedMinutes);

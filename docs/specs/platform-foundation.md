@@ -14,6 +14,13 @@ repository-owned MDX files are idempotently seeded on startup.
 | Mission revision | UUID, mission, locale, version | Name, problem, status, raw MDX, hash, and publication timestamps |
 | Station assignment | UUID, mission, slug, order, publication state | Immutable numbered revisions per locale |
 | Assignment revision | UUID, assignment, locale, version | Name, objective, estimated minutes, raw MDX, hash, and publication timestamps |
+| Adult account | UUID | Normalized email and timestamps |
+| OAuth identity | UUID, provider and provider subject | Provider email and last sign-in time |
+| Child profile | UUID and owning adult | Display name and learning locale |
+| Pairing code | UUID and child profile | Hashed code, expiry, and consumption time |
+| Child device session | UUID and child profile | Hashed token, device label, expiry, and revocation time |
+| Learner workspace | UUID, child profile, and stable assignment | Pinned assignment revision, current version, and timestamps |
+| Workspace snapshot | UUID, workspace, and version | Private blob name, content hash, byte length, and save time |
 
 Exactly one mission revision and one assignment revision may be current for each stable identity
 and locale. Future learner evidence can pin revision UUIDs rather than silently changing when
@@ -26,11 +33,18 @@ authored content is updated.
 | GET | /api/station/overview?locale=ru | Anonymous | Returns the published station and laboratory overview |
 | GET | /api/laboratories/{laboratorySlug}/missions/{missionSlug}?locale=ru | Anonymous | Returns the current mission revision and ordered assignment summaries |
 | GET | /api/laboratories/{laboratorySlug}/missions/{missionSlug}/assignments/{assignmentSlug}?locale=ru | Anonymous | Returns the current assignment revision |
+| POST | /api/auth/oauth-sign-in | Private BFF | Resolves or creates an adult from a social identity |
+| GET/POST | /api/adult/children | Adult | Lists or creates child profiles |
+| POST | /api/adult/children/{childId}/pairing-codes | Adult | Issues a one-use pairing code |
+| DELETE | /api/adult/children/{childId}/devices/{deviceId} | Adult | Revokes a paired browser |
+| POST | /api/child/pair | Anonymous, rate-limited | Exchanges a code for a device session |
+| GET | /api/child/session | Child device | Resolves the current child profile |
+| GET/PUT | /api/child/workspaces/{assignmentRevisionId} | Child device | Restores or version-saves assignment source |
 | GET | /health | Anonymous in development | Reports readiness |
 | GET | /alive | Anonymous in development | Reports process liveness |
 
 The content endpoints are private application APIs consumed by the Next.js BFF. Authentication
-will be added before server-side learner state is introduced.
+and pairing contracts are specified in [Identity and Device Pairing](identity-and-device-pairing.md).
 
 ## Authored Content and MDX
 
@@ -63,13 +77,17 @@ Both published assignments contain a runnable Python workspace:
 - a run can be stopped by terminating the worker and is terminated automatically after 45 seconds;
 - stdout, stderr, and Python exceptions appear in the assignment output panel;
 - stable check codes are evaluated deterministically from source and observed output;
-- the current draft is stored in browser local storage under a stable assignment key;
-- reloading the same browser restores that draft.
+- the current draft is cached in browser local storage under a stable assignment key;
+- an unpaired browser restores its local draft;
+- a paired browser automatically saves immutable source versions to private Blob Storage with
+  ownership and version metadata in PostgreSQL;
+- a second paired browser restores the latest durable source;
+- optimistic version checks prevent silent cross-device overwrites;
+- the current source can be downloaded as a Python file.
 
-This workspace is an executable product slice, not the final durable workspace. It does not yet
-sync to PostgreSQL or Blob Storage, resume on a second device, export files, record evidence, or
-provide JupyterLite notebooks. The UI labels its state as local browser storage and does not claim
-server persistence.
+This remains a single-file executable product slice. It does not yet expose version history,
+multi-file projects, persisted run output, authoritative evidence, or JupyterLite notebooks. See
+[Learner Workspaces](learner-workspaces.md) for synchronisation and conflict behavior.
 
 ## Interface
 
@@ -103,16 +121,18 @@ Aspire orchestrates PostgreSQL 17 and Azure Storage emulation through Azurite. B
 development volumes. The API receives the `zhasyl` PostgreSQL connection string and `blobs`
 storage reference through Aspire service discovery. The local AppHost, dashboard, telemetry, and
 resource service endpoints use HTTP and do not require a development certificate. Blob storage
-is wired but not consumed yet.
+stores private learner workspace snapshots.
+
+Normal development uses named PostgreSQL and Azurite volumes. Playwright starts the same AppHost
+with ephemeral infrastructure, preventing test identities and workspace blobs from contaminating
+the developer's persisted local state.
 
 ## Not Implemented Yet
 
-- social authentication and adult accounts;
-- child profiles, pairing, and revocable device sessions;
-- server-side workspaces and cross-device restore;
 - authoritative check-run and evidence persistence;
 - progress and mission unlocking;
 - reflections stored outside the learner's own notes;
 - adult session summaries;
 - JupyterLite scientific journals;
+- production OAuth application configuration, recovery, and consent records;
 - reviewed Kazakh interface catalogs and authored content.

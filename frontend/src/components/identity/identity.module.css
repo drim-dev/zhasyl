@@ -1,0 +1,283 @@
+.page {
+  min-height: 100vh;
+  padding: 32px clamp(20px, 5vw, 72px) 64px;
+}
+
+.shell {
+  width: min(1040px, 100%);
+  margin: 0 auto;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 56px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.stationLink {
+  font-weight: 750;
+}
+
+.quietLink,
+.signOut {
+  min-height: 44px;
+  padding: 10px 14px;
+  color: var(--color-text-muted);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.hero {
+  max-width: 720px;
+  padding: 72px 0 48px;
+}
+
+.eyebrow {
+  margin-bottom: 12px;
+  color: var(--color-brand);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.hero > p:last-child {
+  margin-top: 20px;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.4fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.panel,
+.childCard {
+  padding: 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-card);
+}
+
+.panel h2,
+.childCard h2 {
+  margin-bottom: 8px;
+  font-size: 1.25rem;
+}
+
+.panel > p,
+.childMeta {
+  color: var(--color-text-muted);
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.form label {
+  font-weight: 700;
+}
+
+.formRow {
+  display: flex;
+  gap: 10px;
+}
+
+.form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  color: var(--color-text);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+}
+
+.form button,
+.pairingForm button {
+  min-height: 48px;
+  padding: 10px 18px;
+  color: var(--color-on-brand);
+  font-weight: 750;
+  white-space: nowrap;
+  background: var(--color-brand);
+  border: 0;
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.form button:disabled,
+.pairingForm button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.formHint {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.children {
+  display: grid;
+  gap: 16px;
+}
+
+.childHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.pairingForm {
+  margin-top: 20px;
+}
+
+.codePanel {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding: 18px;
+  background: var(--color-brand-soft);
+  border-radius: var(--radius-control);
+}
+
+.codePanel span,
+.deviceList h3 {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.codePanel strong,
+.codeInput {
+  font-family: var(--font-mono), monospace;
+  font-size: 1.7rem;
+  letter-spacing: 0.12em;
+}
+
+.codePanel a {
+  width: fit-content;
+  margin-top: 4px;
+  color: var(--color-brand);
+  font-weight: 750;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.deviceList {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.deviceList ul {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+  list-style: none;
+}
+
+.device {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  background: var(--color-surface-subtle);
+  border-radius: var(--radius-control);
+}
+
+.device small {
+  display: block;
+  color: var(--color-text-muted);
+}
+
+.device button {
+  min-height: 44px;
+  padding: 8px 12px;
+  color: var(--color-danger);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.success {
+  color: var(--color-brand);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.centerPanel {
+  width: min(620px, 100%);
+  margin: 10vh auto 0;
+}
+
+.providerList {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.providerList button {
+  width: 100%;
+  min-height: 48px;
+  color: var(--color-text);
+  font-weight: 700;
+  background: var(--color-surface-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .page {
+    padding: 20px 16px 48px;
+  }
+
+  .hero {
+    padding: 48px 0 32px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .formRow,
+  .device,
+  .topbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .formRow {
+    display: flex;
+  }
+
+  .form button,
+  .pairingForm button {
+    white-space: normal;
+  }
+}

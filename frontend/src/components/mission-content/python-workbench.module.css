@@ -160,6 +160,11 @@
   border-color: var(--color-brand);
 }
 
+.secondaryButton:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
 .checkPanel {
   padding: 1rem;
   background: var(--color-surface-subtle);

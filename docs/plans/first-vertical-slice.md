@@ -11,7 +11,7 @@ and produce a factual adult summary.
 
 ## Current Implementation Checkpoint
 
-The agent-free content and execution checkpoint is implemented:
+The agent-free content, execution, and family-access checkpoints are implemented:
 
 - both first assignments render from independently versioned Russian MDX revisions;
 - both assignments include theory, scientific boundaries, prediction, three hints, reflection,
@@ -20,11 +20,17 @@ The agent-free content and execution checkpoint is implemented:
 - locally served Pyodide runs editable Python in a terminable browser worker;
 - deterministic preview checks use stable codes and observable output;
 - a draft restores after refresh in the same browser;
-- Playwright covers both assignments, both themes, and desktop, tablet, and mobile reading layouts.
+- Playwright covers both assignments, both themes, and desktop, tablet, and mobile reading layouts;
+- adults can sign in locally, create child profiles, issue one-use pairing codes, and revoke child
+  browser sessions;
+- child browsers receive a revocable, expiring HttpOnly device session without an email account;
+- paired workspaces autosave immutable source versions and restore on a second browser;
+- local drafts survive offline use and are promoted when an empty paired workspace first opens;
+- source can be downloaded, and stale cross-device writes produce an explicit conflict.
 
-The complete vertical slice is not finished. Adult authentication, child pairing, durable backend
-workspace versions, second-device restore, authoritative check evidence, reflections, progression,
-JupyterLite, and the adult summary remain in the plan below. Local browser storage and client-side
+The complete vertical slice is not finished. Production social-provider configuration, durable
+multi-file workspace history, authoritative check evidence, reflections, progression, JupyterLite,
+and the adult summary remain in the plan below. Local browser storage and client-side
 preview checks must not be treated as substitutes for those application use cases.
 
 ## Slice boundaries

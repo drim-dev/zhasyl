@@ -31,7 +31,12 @@ export default async function AssignmentPage({
   return (
     <AssignmentView
       assignment={assignment}
-      body={<MissionMdx source={assignment.bodyMdx} />}
+      body={
+        <MissionMdx
+          source={assignment.bodyMdx}
+          assignmentRevisionId={assignment.revisionId}
+        />
+      }
     />
   );
 }

@@ -7,61 +7,190 @@ import {
   type RunResult,
   type WorkbenchId,
 } from "./python-checks";
+import {
+  loadWorkspace,
+  saveWorkspace,
+  WorkspaceConflictError,
+} from "@/lib/workspace-client";
 import styles from "./python-workbench.module.css";
 
-interface PythonWorkbenchProps {
+export interface PythonWorkbenchProps {
   assignment: WorkbenchId;
+  assignmentRevisionId: string;
 }
 
 interface WorkerResponse extends RunResult {
   id: string;
 }
 
+interface LocalSyncState {
+  serverVersion: number;
+  dirty: boolean;
+}
+
 const runTimeoutMilliseconds = 45_000;
 
 export function PythonWorkbench({
   assignment,
+  assignmentRevisionId,
 }: PythonWorkbenchProps): React.ReactElement {
   const definition = workbenches[assignment];
   const storageKey = `zhasyl:workspace:${assignment}:v1`;
+  const syncStorageKey = `${storageKey}:sync`;
   const [code, setCode] = useState(definition.starterCode);
   const [output, setOutput] = useState(
     "Нажми «Запустить и проверить», когда код будет готов.",
   );
   const [checks, setChecks] = useState<CheckResult[] | null>(null);
   const [runState, setRunState] = useState<"idle" | "running">("idle");
-  const [saveState, setSaveState] = useState(
-    "Черновик сохраняется в этом браузере",
-  );
+  const [saveState, setSaveState] = useState("Проверяем сохранённую работу…");
+  const [workspaceReady, setWorkspaceReady] = useState(false);
+  const [hasConflict, setHasConflict] = useState(false);
   const workerRef = useRef<Worker | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const versionRef = useRef(0);
+  const pairedRef = useRef(false);
+  const savingRef = useRef(false);
+  const pendingCodeRef = useRef<string | null>(null);
+  const syncBlockedRef = useRef(false);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    const savedCode = window.localStorage.getItem(storageKey);
-    let restoreTimer: ReturnType<typeof setTimeout> | undefined;
+    mountedRef.current = true;
+    const localCode = window.localStorage.getItem(storageKey);
+    const localSync = readLocalSyncState(syncStorageKey);
 
-    if (savedCode) {
-      restoreTimer = setTimeout(() => {
-        setCode(savedCode);
-        setSaveState("Восстановлен локальный черновик");
-      }, 0);
+    async function restore(): Promise<void> {
+      try {
+        const remote = await loadWorkspace(assignmentRevisionId);
+        if (!mountedRef.current) return;
+        if (!remote) {
+          if (localCode) setCode(localCode);
+          setSaveState(
+            localCode
+              ? "Восстановлен черновик из этого браузера"
+              : "Черновик сохраняется в этом браузере",
+          );
+          setWorkspaceReady(true);
+          return;
+        }
+
+        pairedRef.current = true;
+        versionRef.current = remote.version;
+        if (remote.code !== null) {
+          if (localCode && localSync.dirty && localCode !== remote.code) {
+            setCode(localCode);
+            if (localSync.serverVersion === remote.version) {
+              setSaveState("Отправляем несохранённый черновик на станцию…");
+              const saved = await saveWorkspace(
+                assignmentRevisionId,
+                remote.version,
+                localCode,
+              );
+              if (!mountedRef.current) return;
+              versionRef.current = saved.version;
+              writeLocalSyncState(syncStorageKey, saved.version, false);
+              setSaveState(`Сохранено на станции · версия ${saved.version}`);
+            } else {
+              syncBlockedRef.current = true;
+              setHasConflict(true);
+              setSaveState(
+                "На станции есть другая версия · локальный черновик сохранён",
+              );
+            }
+          } else {
+            setCode(remote.code);
+            window.localStorage.setItem(storageKey, remote.code);
+            writeLocalSyncState(syncStorageKey, remote.version, false);
+            setSaveState(`Восстановлено со станции · версия ${remote.version}`);
+          }
+        } else if (localCode) {
+          setCode(localCode);
+          setSaveState("Переносим локальный черновик на станцию…");
+          const saved = await saveWorkspace(
+            assignmentRevisionId,
+            remote.version,
+            localCode,
+          );
+          if (!mountedRef.current) return;
+          versionRef.current = saved.version;
+          writeLocalSyncState(syncStorageKey, saved.version, false);
+          setSaveState(`Сохранено на станции · версия ${saved.version}`);
+        } else {
+          setSaveState("Устройство подключено · изменений пока нет");
+        }
+      } catch {
+        if (localCode) setCode(localCode);
+        setSaveState("Нет связи со станцией · черновик сохранится в браузере");
+      } finally {
+        if (mountedRef.current) setWorkspaceReady(true);
+      }
     }
+    void restore();
 
     return () => {
-      if (restoreTimer) {
-        clearTimeout(restoreTimer);
-      }
+      mountedRef.current = false;
       workerRef.current?.terminate();
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+      }
     };
-  }, [storageKey]);
+  }, [assignmentRevisionId, storageKey, syncStorageKey]);
+
+  async function flushServerSave(): Promise<void> {
+    if (savingRef.current || syncBlockedRef.current) return;
+    savingRef.current = true;
+    while (pendingCodeRef.current !== null && !syncBlockedRef.current) {
+      const content = pendingCodeRef.current;
+      pendingCodeRef.current = null;
+      try {
+        const saved = await saveWorkspace(
+          assignmentRevisionId,
+          versionRef.current,
+          content,
+        );
+        versionRef.current = saved.version;
+        writeLocalSyncState(
+          syncStorageKey,
+          saved.version,
+          window.localStorage.getItem(storageKey) !== content,
+        );
+        if (mountedRef.current) {
+          setSaveState(`Сохранено на станции · версия ${saved.version}`);
+        }
+      } catch (error) {
+        if (error instanceof WorkspaceConflictError) {
+          syncBlockedRef.current = true;
+          if (mountedRef.current) {
+            setHasConflict(true);
+            setSaveState(
+              "На другом устройстве есть новая версия · выберите версию станции",
+            );
+          }
+        } else if (mountedRef.current) {
+          setSaveState("Нет связи со станцией · черновик сохранён в браузере");
+        }
+      }
+    }
+    savingRef.current = false;
+  }
 
   function saveCode(nextCode: string): void {
     setCode(nextCode);
     window.localStorage.setItem(storageKey, nextCode);
-    setSaveState("Сохранено в этом браузере");
+    writeLocalSyncState(syncStorageKey, versionRef.current, true);
+    if (!pairedRef.current) {
+      setSaveState("Сохранено в этом браузере");
+      return;
+    }
+    pendingCodeRef.current = nextCode;
+    setSaveState("Сохраняем на станции…");
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => void flushServerSave(), 800);
   }
 
   function getWorker(): Worker {
@@ -105,7 +234,7 @@ export function PythonWorkbench({
     worker.postMessage({ id, code });
     timeoutRef.current = setTimeout(() => {
       stopWorker(
-        "Выполнение остановлено через 10 секунд. Проверь, нет ли бесконечного цикла.",
+        "Выполнение остановлено через 45 секунд. Проверь, нет ли бесконечного цикла.",
       );
     }, runTimeoutMilliseconds);
   }
@@ -122,6 +251,43 @@ export function PythonWorkbench({
     saveCode(definition.starterCode);
     setOutput("Стартовый код восстановлен.");
     setChecks(null);
+  }
+
+  function downloadCode(): void {
+    const url = URL.createObjectURL(
+      new Blob([code], { type: "text/x-python;charset=utf-8" }),
+    );
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = definition.fileName;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function restoreStationVersion(): Promise<void> {
+    if (
+      !window.confirm(
+        "Загрузить версию со станции? Локальный черновик будет заменён.",
+      )
+    ) {
+      return;
+    }
+    setSaveState("Загружаем версию со станции…");
+    try {
+      const remote = await loadWorkspace(assignmentRevisionId);
+      if (!remote || remote.code === null) {
+        throw new Error("No remote workspace.");
+      }
+      versionRef.current = remote.version;
+      syncBlockedRef.current = false;
+      setHasConflict(false);
+      setCode(remote.code);
+      window.localStorage.setItem(storageKey, remote.code);
+      writeLocalSyncState(syncStorageKey, remote.version, false);
+      setSaveState(`Восстановлено со станции · версия ${remote.version}`);
+    } catch {
+      setSaveState("Не удалось загрузить версию станции · черновик сохранён");
+    }
   }
 
   const passedCount = checks?.filter((check) => check.passed).length ?? 0;
@@ -149,6 +315,7 @@ export function PythonWorkbench({
             aria-label="Редактор Python-кода"
             value={code}
             onChange={(event) => saveCode(event.target.value)}
+            disabled={!workspaceReady}
             spellCheck={false}
             autoCapitalize="off"
             autoCorrect="off"
@@ -166,7 +333,7 @@ export function PythonWorkbench({
           className={styles.runButton}
           type="button"
           onClick={runCode}
-          disabled={runState === "running"}
+          disabled={!workspaceReady || runState === "running"}
         >
           <span aria-hidden="true">▶</span>
           {runState === "running"
@@ -190,6 +357,23 @@ export function PythonWorkbench({
             Вернуть стартовый код
           </button>
         )}
+        <button
+          type="button"
+          className={styles.secondaryButton}
+          onClick={downloadCode}
+          disabled={!workspaceReady}
+        >
+          Скачать файл
+        </button>
+        {hasConflict ? (
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={() => void restoreStationVersion()}
+          >
+            Загрузить версию станции
+          </button>
+        ) : null}
       </div>
 
       {checks ? (
@@ -212,4 +396,33 @@ export function PythonWorkbench({
       ) : null}
     </section>
   );
+}
+
+function readLocalSyncState(key: string): LocalSyncState {
+  try {
+    const value: unknown = JSON.parse(
+      window.localStorage.getItem(key) ?? "null",
+    );
+    if (
+      typeof value === "object" &&
+      value !== null &&
+      "serverVersion" in value &&
+      typeof value.serverVersion === "number" &&
+      "dirty" in value &&
+      typeof value.dirty === "boolean"
+    ) {
+      return { serverVersion: value.serverVersion, dirty: value.dirty };
+    }
+  } catch {
+    // A damaged cache marker must not prevent access to the local source draft.
+  }
+  return { serverVersion: 0, dirty: true };
+}
+
+function writeLocalSyncState(
+  key: string,
+  serverVersion: number,
+  dirty: boolean,
+): void {
+  window.localStorage.setItem(key, JSON.stringify({ serverVersion, dirty }));
 }

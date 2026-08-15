@@ -36,7 +36,7 @@ export function AssignmentView({
           <div className={styles.assignmentMeta}>
             <span>{assignment.estimatedMinutes} минут</span>
             <span>Python в браузере</span>
-            <span>Черновик сохраняется локально</span>
+            <span>Сохранение на станции после подключения</span>
           </div>
         </header>
 

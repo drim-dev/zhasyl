@@ -15,6 +15,9 @@ export function StationHeader(): React.ReactElement {
         </span>
       </Link>
       <div className={styles.headerControls}>
+        <Link className={styles.accessLink} href="/connect">
+          Доступ
+        </Link>
         <div className={styles.connectionStatus} role="status">
           <span aria-hidden="true" />
           Связь установлена

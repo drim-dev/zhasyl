@@ -45,9 +45,16 @@ From the Station overview, open either laboratory and its first assignment:
 - Materials: **Sealant No. 17 — Balance formula No. 17**.
 
 Each assignment includes Russian theory, an interactive visualization, prediction, editable and
-runnable Python, deterministic checks, three hints, and journal questions. The code draft is
-currently saved in that browser only. Accounts, server synchronisation, cross-device restore, and
-JupyterLite are not implemented yet.
+runnable Python, deterministic checks, three hints, and journal questions. An unpaired browser
+keeps its draft locally. A paired child browser also saves versioned source snapshots to the
+station and restores them on another paired device. Multi-file workspaces, saved check evidence,
+and JupyterLite are not implemented yet.
+
+Open `/adult/sign-in` and use the local development sign-in to test family access without an OAuth
+application. An adult can create a child profile and a ten-minute pairing code. Enter that code at
+`/connect` on the child's browser. The resulting device session lasts up to ninety days and can be
+revoked from the adult page. Google, GitHub, and GitLab buttons appear when their corresponding
+`AUTH_*_ID` and `AUTH_*_SECRET` environment variables are configured.
 
 The browser does not call the ASP.NET Core API directly. Mission and assignment pages are rendered
 on the Next.js server from private API responses. The interface follows the operating-system
@@ -62,7 +69,9 @@ make format-check
 ~~~
 
 `make test-e2e` starts the complete application through Aspire, checks desktop, tablet, mobile,
-keyboard, and theme journeys, and executes working Python solutions for both assignments.
+keyboard, and theme journeys, and executes working Python solutions for both assignments. It uses
+ephemeral PostgreSQL and Azurite resources, so test profiles and workspaces never enter the named
+development volumes used by `make dev`.
 
 ## Repository Map
 
