@@ -18,7 +18,6 @@
       "Bash(git show:*)"
     ],
     "deny": [
-      "Bash(git push:*)",
       "Bash(git reset --hard:*)",
       "Bash(git checkout -- :*)",
       "Bash(git clean:*)"
